@@ -24,6 +24,8 @@ extension DrawingToolExtension on DrawingTool {
         return StrokeType.rectangle;
       case DrawingTool.hand:
         return StrokeType.hand;
+      case DrawingTool.text:
+        return StrokeType.text;
     }
   }
 
@@ -47,6 +49,8 @@ extension DrawingToolExtension on DrawingTool {
         return "Eraser";
       case DrawingTool.pencil:
         return "Pencil";
+      case DrawingTool.text:
+        return "Text";
     }
   }
 
@@ -59,18 +63,25 @@ extension DrawingToolExtension on DrawingTool {
   MouseCursor get cursor {
     switch (strokeType) {
       case StrokeType.select:
-        return SystemMouseCursors.click;
+        return SystemMouseCursors.basic;
       case StrokeType.pencil:
+        return SystemMouseCursors.precise;
       case StrokeType.hand:
-        return SystemMouseCursors.click;
+        return SystemMouseCursors.grab;
       case StrokeType.line:
+        return SystemMouseCursors.precise;
       case StrokeType.rectangle:
+        return SystemMouseCursors.precise;
       case StrokeType.arrow:
+        return SystemMouseCursors.precise;
       case StrokeType.circle:
+        return SystemMouseCursors.precise;
       case StrokeType.square:
         return SystemMouseCursors.precise;
       case StrokeType.eraser:
         return SystemMouseCursors.cell;
+      case StrokeType.text:
+        return SystemMouseCursors.text;
     }
   }
 }

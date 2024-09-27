@@ -10,6 +10,7 @@ enum DrawingTool {
   circle,
   pencil,
   eraser,
+  text,
 }
 
 enum SelectOptions {
@@ -163,6 +164,12 @@ extension MainDrawingToolExtension on MainDrawingTool {
       case MainDrawingTool.text:
         return "Text";
     }
+  }
+
+  static MainDrawingTool fromName(String name) {
+    return MainDrawingTool.values.firstWhere(
+      (e) => e.getName().toLowerCase() == name.toLowerCase(),
+    );
   }
 
   List<String> getOptionsList() {

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:socratica/core/constants/asset_strings.dart';
 import 'package:socratica/features/canvas/presentation/components/widgets/drawer_option_row_widget.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../home/presentation/controller/home_controller.dart';
 import 'widgets/color_selection_widget.dart';
 
 class AnimatedDrawer extends StatelessWidget {
@@ -34,46 +36,165 @@ class AnimatedDrawer extends StatelessWidget {
       curve: Curves.easeInOut,
       child: isOpen
           ? Container(
-              height: 420.h,
+              height: 700.h,
               width: 440.w,
               padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
               decoration: BoxDecoration(
                   color: AppColors.canvasSecondaryColor,
                   borderRadius: BorderRadius.circular(10.r)),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const DrawerOptionRowWidget(
-                    leadingAsset: AssetStrings.fileSvg,
-                    title: "Open",
-                    hint: "Ctrl+O",
+                  Material(
+                    color: Colors.transparent,
+                    animationDuration: const Duration(milliseconds: 400),
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const DrawerOptionRowWidget(
+                        leadingAsset: AssetStrings.fileSvg,
+                        title: "Open",
+                        hint: "Ctrl+O",
+                      ),
+                    ),
                   ),
                   SizedBox(
                     height: 20.h,
                   ),
-                  const DrawerOptionRowWidget(
-                    leadingAsset: AssetStrings.downloadSvg,
-                    title: "Save to..",
+                  Material(
+                    color: Colors.transparent,
+                    animationDuration: const Duration(milliseconds: 400),
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const DrawerOptionRowWidget(
+                        leadingAsset: AssetStrings.downloadSvg,
+                        title: "Save to..",
+                      ),
+                    ),
                   ),
                   SizedBox(
                     height: 20.h,
                   ),
-                  const DrawerOptionRowWidget(
-                    leadingAsset: AssetStrings.exportSvg,
-                    title: "Export Image",
-                    hint: "Ctrl+Shift+E",
+                  Material(
+                    color: Colors.transparent,
+                    animationDuration: const Duration(milliseconds: 400),
+                    borderRadius: BorderRadius.circular(15.r),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const DrawerOptionRowWidget(
+                        leadingAsset: AssetStrings.exportSvg,
+                        title: "Export Image",
+                        hint: "Ctrl+Shift+E",
+                      ),
+                    ),
                   ),
                   SizedBox(
                     height: 20.h,
                   ),
-                  const DrawerOptionRowWidget(
-                    leadingAsset: AssetStrings.resetSvg,
-                    title: "Reset the canvas",
+                  Material(
+                    color: Colors.transparent,
+                    animationDuration: const Duration(milliseconds: 400),
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: InkWell(
+                      onTap: () {
+                        Get.find<HomeController>().clear();
+                      },
+                      child: const DrawerOptionRowWidget(
+                        leadingAsset: AssetStrings.resetSvg,
+                        title: "Reset the canvas",
+                      ),
+                    ),
                   ),
                   SizedBox(
                     height: 20.h,
                   ),
-                  Divider(
+                  const Divider(
+                    color: AppColors.canvasDividerColor,
+                  ),
+                  Text(
+                    "Font Size",
+                    style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.whiteColor),
+                  ),
+                  Obx(
+                    () => Row(
+                      children: [
+                        Text(
+                          "${Get.find<HomeController>().fontSize.value.toInt()}",
+                          style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.canvasStrokeBgColor),
+                        ),
+                        Expanded(
+                          child: Slider(
+                            value: Get.find<HomeController>().fontSize.value,
+                            min: 1,
+                            max: 48,
+                            divisions: 48,
+                            onChanged: (value) {
+                              Get.find<HomeController>().fontSize.value = value;
+                            },
+                            activeColor: AppColors.canvasButtonColor,
+                            inactiveColor: AppColors.canvasStrokeBgColor,
+                          ),
+                        ),
+                        Text(
+                          "48",
+                          style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.canvasStrokeBgColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    "Stroke",
+                    style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.whiteColor),
+                  ),
+                  Obx(
+                    () => Row(
+                      children: [
+                        Text(
+                          "${Get.find<HomeController>().strokeSize.value.toInt()}",
+                          style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.canvasStrokeBgColor),
+                        ),
+                        Expanded(
+                          child: Slider(
+                            value: Get.find<HomeController>().strokeSize.value,
+                            min: 1,
+                            max: 48,
+                            divisions: 48,
+                            onChanged: (value) {
+                              Get.find<HomeController>().strokeSize.value =
+                                  value;
+                            },
+                            activeColor: AppColors.canvasButtonColor,
+                            inactiveColor: AppColors.canvasStrokeBgColor,
+                          ),
+                        ),
+                        Text(
+                          "50",
+                          style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.canvasStrokeBgColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(
                     color: AppColors.canvasDividerColor,
                   ),
                   SizedBox(

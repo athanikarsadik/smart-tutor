@@ -20,7 +20,7 @@ class HorizontalColorDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 0.h),
         decoration: BoxDecoration(
           color: AppColors.canvasSecondaryColor,
           borderRadius: BorderRadius.circular(10.r),
@@ -29,8 +29,8 @@ class HorizontalColorDropdown extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 22.sp,
-              height: 22.sp,
+              width: 25.sp,
+              height: 25.sp,
               decoration: BoxDecoration(
                 color: selectedValue,
                 shape: BoxShape.circle,
@@ -66,42 +66,46 @@ class HorizontalColorDropdown extends StatelessWidget {
             PopupMenuItem<Color>(
               enabled: false,
               child: SizedBox(
-                height: 40.h,
+                height: 75.h,
                 width: 350.w,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: colors.length,
-                  itemBuilder: (context, index) {
-                    Color color = colors[index];
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4.w),
-                      child: GestureDetector(
-                        onTap: () {
-                          onChanged(color);
-                          Navigator.of(context).pop();
-                        },
-                        child: CircleAvatar(
-                          radius: 22.r,
-                          backgroundColor: selectedValue ==
-                                  MaterialColor(color.value, const {})
-                              ? AppColors.canvasButtonColor
-                              : Colors.transparent,
-                          child: Container(
-                            width: 35.w,
-                            height: 35.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: color,
-                              border: Border.all(
-                                color: AppColors.canvasSecondaryColor,
-                                width: 2.w,
+                child: Scrollbar(
+                  thumbVisibility: true,
+                  thickness: 3.0.w,
+                  radius: Radius.circular(8.r),
+                  controller: ScrollController(),
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: colors.length,
+                    itemBuilder: (context, index) {
+                      Color color = colors[index];
+                      return Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 4.w, vertical: 10.h),
+                        child: GestureDetector(
+                          onTap: () {
+                            onChanged(color);
+                            Navigator.of(context).pop();
+                          },
+                          child: CircleAvatar(
+                            radius: 20.r,
+                            backgroundColor: selectedValue ==
+                                    MaterialColor(color.value, const {})
+                                ? AppColors.canvasButtonColor
+                                : AppColors.canvasSecondaryColor,
+                            child: Container(
+                              width: 35.w,
+                              height: 35.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: color,
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             ),

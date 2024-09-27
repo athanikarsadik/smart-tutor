@@ -30,8 +30,6 @@ class _ResultsDisplayState extends State<ResultsDisplay> {
                 controller: controller.chatScrollController,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  WidgetsBinding.instance.addPostFrameCallback(
-                      (_) => controller.scrollToBottomChat());
                   final Content content = controller.chats[index];
                   return ChatItemWidget(
                     content: content,

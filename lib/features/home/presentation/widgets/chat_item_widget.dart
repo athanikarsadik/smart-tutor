@@ -4,10 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:socratica/features/home/presentation/controller/home_controller.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import 'expandable_text_widget.dart';
-import 'package:lottie/lottie.dart';
 
 class ChatItemWidget extends StatelessWidget {
   final Content content;
@@ -16,85 +15,106 @@ class ChatItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        content.role == "user"
-            ? content.parts.last is TextPart
-                ? Padding(
-                    padding: EdgeInsets.only(bottom: 5.h, top: 5.h),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 50.w,
-                          height: 35.w,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.r),
-                              color: AppColors.homescreenBgColor),
-                          child: const Icon(
-                            Icons.person,
-                            color: Colors.blue,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10.w,
-                        ),
-                        Expanded(
-                            child: Container(
-                                padding: EdgeInsets.all(10.h),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10.r),
-                                    color: const Color(0xFF7176ED)),
-                                child: ExpandableTextWidget(
-                                  text: content.parts.last is TextPart
-                                      ? (content.parts.last as TextPart).text
-                                      : 'Cannot generate data!',
-                                ))),
-                      ],
+    final bool isUser = content.role == "user";
+    final String messageText = content.parts.last is TextPart
+        ? (content.parts.last as TextPart).text
+        : 'Cannot generate data!';
+
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        constraints: BoxConstraints(maxWidth: isUser ? 0.17.sw : 0.7.sw),
+        margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
+        padding: EdgeInsets.all(12.sp),
+        decoration: BoxDecoration(
+          color: isUser
+              ? AppColors.canvasChatUserColor
+              : AppColors.canvasChatAIColor,
+          borderRadius: BorderRadius.only(
+              topLeft:
+                  isUser ? Radius.circular(20.r) : const Radius.circular(0),
+              topRight:
+                  isUser ? const Radius.circular(0) : Radius.circular(20.r),
+              bottomLeft: Radius.circular(20.r),
+              bottomRight: Radius.circular(20.r)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (!isUser)
+              Obx(() {
+                final isStreaming =
+                    Get.find<HomeController>().isStreaming.value;
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isStreaming)
+                      Lottie.asset(
+                        'assets/lottie/streaming.json',
+                        width: 20.w,
+                        height: 20.h,
+                      )
+                    else
+                      Icon(Icons.smart_toy, size: 20.sp, color: Colors.white),
+                    SizedBox(width: 8.w),
+                    const Text(
+                      "AI",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  )
-                : const SizedBox.shrink()
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                  ],
+                );
+              }),
+            if (isUser)
+              Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  InkWell(
-                    onTap: () {},
-                    child: Obx(
-                      () => Padding(
-                        padding: EdgeInsets.only(left: 5.w, top: 15.h),
-                        child: Get.find<HomeController>().isStreaming.value
-                            ? Lottie.asset('assets/lottie/streaming.json',
-                                width: 25.w, height: 25.h)
-                            : Icon(Icons.copy_all_outlined, size: 25.sp),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 10.h, horizontal: 15.w),
-                      child: Markdown(
-                        shrinkWrap: true,
-                        styleSheet:
-                            MarkdownStyleSheet.fromTheme(Theme.of(context))
-                                .copyWith(
-                          p: const TextStyle(
-                              color: Colors.black), // Set text color to black
-                        ),
-                        selectable: true,
-                        softLineBreak: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        data: content.parts.last is TextPart
-                            ? (content.parts.last as TextPart).text
-                            : 'Cannot generate data!',
-                      ),
+                  Icon(Icons.person, size: 20.sp, color: Colors.white),
+                  SizedBox(width: 8.w),
+                  const Text(
+                    "You",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ],
               ),
-      ],
+            SizedBox(height: 8.h),
+            isUser
+                ? Text(
+                    messageText,
+                    style: const TextStyle(color: Colors.white),
+                  )
+                : Markdown(
+                    shrinkWrap: true,
+                    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                        .copyWith(
+                      p: const TextStyle(color: Colors.white),
+                      code: TextStyle(
+                        backgroundColor: Colors.white.withOpacity(0.1),
+                        color: Colors.white,
+                      ),
+                    ),
+                    selectable: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    data: messageText,
+                  ),
+            if (!isUser)
+              Align(
+                alignment: Alignment.bottomRight,
+                child: IconButton(
+                  icon: Icon(Icons.copy, size: 18.sp, color: Colors.white70),
+                  onPressed: () {
+                    // Implement copy functionality
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

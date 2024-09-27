@@ -18,7 +18,8 @@ class DrawerOptionRowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.all(0),
+      contentPadding: EdgeInsets.all(8.sp),
+      mouseCursor: SystemMouseCursors.click,
       minVerticalPadding: 0,
       dense: true,
       minTileHeight: 20.h,

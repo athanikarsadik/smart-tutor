@@ -32,8 +32,8 @@ class IconWidget extends StatelessWidget {
       () => Row(
         children: [
           Container(
-            height: 40.sp,
-            width: 40.sp,
+            height: 45.sp,
+            width: 45.sp,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10.r),
               color: _controller.mainSelectedTool.value == mainDrawingTool
@@ -83,6 +83,10 @@ class IconWidget extends StatelessWidget {
                     break;
                   case "Text":
                     _controller.mainSelectedTool.value = MainDrawingTool.text;
+                    _controller.selectedDrawingTool.value =
+                        DrawingToolExtension.fromName(
+                            _controller.mainSelectedTool.value.getName());
+                    _controller.update();
                     break;
                 }
               },
@@ -118,6 +122,7 @@ class IconWidget extends StatelessWidget {
                                   MainDrawingTool.selectOptions;
                               _controller.selectedDrawingTool.value =
                                   DrawingToolExtension.fromName(val);
+                              _controller.update();
                             }
                           },
                           child: Icon(
@@ -144,6 +149,7 @@ class IconWidget extends StatelessWidget {
                                       MainDrawingTool.shapeOptions;
                                   _controller.selectedDrawingTool.value =
                                       DrawingToolExtension.fromName(val);
+                                  _controller.update();
                                 }
                               },
                               child: Icon(
@@ -172,6 +178,7 @@ class IconWidget extends StatelessWidget {
                                           MainDrawingTool.drawToolOptions;
                                       _controller.selectedDrawingTool.value =
                                           DrawingToolExtension.fromName(val);
+                                      _controller.update();
                                     }
                                   },
                                   child: Icon(

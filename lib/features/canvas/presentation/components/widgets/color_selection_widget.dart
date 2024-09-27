@@ -35,6 +35,7 @@ class _AnimatedColorPaletteState extends State<AnimatedColorPalette> {
               widget.onColorSelected(widget.colors[index]);
             },
             child: AnimatedContainer(
+              alignment: Alignment.center,
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
               margin: EdgeInsets.symmetric(horizontal: 5.sp, vertical: 5.sp),
@@ -45,7 +46,7 @@ class _AnimatedColorPaletteState extends State<AnimatedColorPalette> {
                 borderRadius: BorderRadius.circular(10.r),
                 border: Border.all(
                   color: _selectedIndex == index
-                      ? AppColors.canvasBorderColor
+                      ? AppColors.whiteColor
                       : AppColors.borderColor,
                   width: 2,
                 ),

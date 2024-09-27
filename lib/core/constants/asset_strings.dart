@@ -22,4 +22,7 @@ class AssetStrings {
   static const downloadSvg = "svg/download.svg";
   static const resetSvg = "svg/reset.svg";
   static const exportSvg = "svg/export_png.svg";
+  static const expandSvg = "svg/expand.svg";
+  static const contractSvg = "svg/contract.svg";
+  static const addImageSvg = "svg/image.svg";
 }

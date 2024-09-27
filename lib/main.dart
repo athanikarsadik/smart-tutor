@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return ScreenUtilInit(
       designSize: const Size(1920, 1080),
       builder: (context, child) {
-        return MaterialApp(
+        return GetMaterialApp(
           title: 'Socratica',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.darkThemeMode,

@@ -17,6 +17,8 @@ class CustomTooltip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: message,
+      margin: EdgeInsets.symmetric(vertical: 5.h),
+      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
       textStyle: TextStyle(
         color: AppColors.whiteColor,
         fontWeight: FontWeight.w500,

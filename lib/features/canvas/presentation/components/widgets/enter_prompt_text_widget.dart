@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:socratica/core/constants/asset_strings.dart';
 import 'package:socratica/core/theme/app_colors.dart';
+import 'package:socratica/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
+import 'package:socratica/features/home/presentation/controller/home_controller.dart';
 
 class EnterPromptTextWidget extends StatefulWidget {
-  const EnterPromptTextWidget({super.key});
+  final int minFlex;
+  const EnterPromptTextWidget({super.key, this.minFlex = 2});
 
   @override
   State<EnterPromptTextWidget> createState() => _EnterPromptTextWidgetState();
@@ -42,6 +46,16 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
               maxLines: null,
               minLines: 1,
               decoration: InputDecoration(
+                suffixIcon: CustomTooltip(
+                  message: "Add canvas image",
+                  child: Padding(
+                    padding: EdgeInsets.all(10.sp),
+                    child: SvgPicture.asset(
+                      AssetStrings.addImageSvg,
+                      height: 12.sp,
+                    ),
+                  ),
+                ),
                 hintText: "What's in your mind?",
                 hintStyle: TextStyle(
                     color: AppColors.whiteColor.withOpacity(0.5),
@@ -69,30 +83,38 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
           ),
           SizedBox(width: 10.w),
           Expanded(
-            flex: 2,
-            child: Container(
-                height: 70.h,
-                padding: EdgeInsets.all(12.sp),
-                decoration: BoxDecoration(
-                  color: promptController.text.trim().isEmpty
-                      ? AppColors.canvasSecondaryColor
-                      : AppColors.canvasButtonColor,
-                  borderRadius: BorderRadius.circular(10.r),
-                  border: Border.all(
-                      width: 0.6,
-                      color: promptController.text.trim().isEmpty
-                          ? AppColors.canvasBorderColor
-                          : Colors.transparent),
-                ),
-                child: SvgPicture.asset(
-                  AssetStrings.sendSvg,
-                  height: 25.sp,
-                  colorFilter: ColorFilter.mode(
-                      promptController.text.trim().isNotEmpty
-                          ? AppColors.whiteColor
-                          : AppColors.canvasButtonColor,
-                      BlendMode.srcIn),
-                )),
+            flex: widget.minFlex,
+            child: InkWell(
+              onTap: () {
+                var prompt = promptController.text.trim();
+                if (prompt.isNotEmpty) {
+                  Get.find<HomeController>().calculate();
+                }
+              },
+              child: Container(
+                  height: 70.h,
+                  padding: EdgeInsets.all(12.sp),
+                  decoration: BoxDecoration(
+                    color: promptController.text.trim().isEmpty
+                        ? AppColors.canvasSecondaryColor
+                        : AppColors.canvasButtonColor,
+                    borderRadius: BorderRadius.circular(10.r),
+                    border: Border.all(
+                        width: 0.6,
+                        color: promptController.text.trim().isEmpty
+                            ? AppColors.canvasBorderColor
+                            : Colors.transparent),
+                  ),
+                  child: SvgPicture.asset(
+                    AssetStrings.sendSvg,
+                    height: 25.sp,
+                    colorFilter: ColorFilter.mode(
+                        promptController.text.trim().isNotEmpty
+                            ? AppColors.whiteColor
+                            : AppColors.canvasButtonColor,
+                        BlendMode.srcIn),
+                  )),
+            ),
           ),
         ],
       ),

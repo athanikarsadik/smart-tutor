@@ -27,6 +27,9 @@ class AppColors {
   static const Color canvasDividerColor = Color(0xFF303030);
   static const Color canvasDropdownColor = Color(0xFF232323);
   static const Color canvasChatQColor = Color(0xFF2C2C2C);
+  static const Color canvasStrokeBgColor = Color(0xFF616161);
+  static const Color canvasChatUserColor = Color(0xFF0068D1);
+  static const Color canvasChatAIColor = Color(0xFF0079C4);
   static const Color blackColor = Colors.black;
   static const Color whiteColor = Colors.white;
 }

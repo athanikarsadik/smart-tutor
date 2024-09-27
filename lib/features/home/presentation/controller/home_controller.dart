@@ -9,7 +9,6 @@ import 'package:socratica/core/theme/app_colors.dart';
 import '../../../../secrets.dart';
 import '../../domain/entities/drawing_tool_entity.dart';
 import '../../domain/entities/stroke_entity.dart';
-import 'dart:math' as math;
 
 class HomeController extends GetxController {
   RxBool isCalculating = false.obs;
@@ -148,15 +147,14 @@ Remember to tailor your approach to the specific subject being discussed, whethe
     ]),
   ].obs;
 
-  final Rx<Color> selectedColor = MaterialColor(Colors.black.value, {}).obs;
+  final Rx<Color> selectedColor = MaterialColor(Colors.cyan.value, {}).obs;
   final RxDouble strokeSize = 5.0.obs;
   final RxDouble eraserSize = 10.0.obs;
+  final RxDouble fontSize = 10.0.obs;
 
   //====================
   //new tools
-
-  Offset? _selectionStart;
-  Stroke? _selectedStroke;
+  RxBool isChatDialog = true.obs;
 
   final List<Color> colorList = [
     Colors.red,
@@ -185,8 +183,16 @@ Remember to tailor your approach to the specific subject being discussed, whethe
   final RxList<String> aiModels = ['Griot', 'Alloy', 'Jarvis', 'Friday'].obs;
   final RxList<String> aiVoices =
       ['AI Tone', 'Friendly Tone', 'Formal Tone'].obs;
+  final RxList<Stroke> selectedStrokes = <Stroke>[].obs;
+  final Rx<Offset?> dragStartPosition = Rx<Offset?>(null);
+  final Rx<Offset?> totalDragOffset = Rx<Offset?>(null);
 
   final RxInt currentPageIndex = 1.obs;
+
+  // For managing the text editing state
+  TextEditingController textEditingController = TextEditingController();
+  FocusNode textFocusNode = FocusNode();
+  Offset? textPosition;
 
   //====================
 
@@ -200,22 +206,42 @@ Remember to tailor your approach to the specific subject being discussed, whethe
   final RxList<Stroke> _undoStack = <Stroke>[].obs;
   final RxList<Stroke> _redoStack = <Stroke>[].obs;
 
-  final RxBool showCursor = false.obs;
-  final Rx<Offset> cursorPosition = Offset.zero.obs;
-
-  void updateCursorPosition(Offset position) {
-    cursorPosition.value = position;
-    showCursor.value = true;
-  }
-
-  void hideCursor() {
-    showCursor.value = false;
-  }
-
   // Drawing Actions
   void onPanStart(Offset startPoint) {
+    if (selectedDrawingTool.value == DrawingTool.text) {
+      textPosition = startPoint;
+      textEditingController.clear();
+      textFocusNode.requestFocus();
+      update();
+    }
     if (selectedDrawingTool.value == DrawingTool.select) {
-      _handleSelectionStart(startPoint);
+      if (selectedStrokes.isNotEmpty &&
+          _isPointInsideSelectedStrokes(startPoint)) {
+        // Start dragging selected strokes
+        dragStartPosition.value = startPoint;
+        totalDragOffset.value = Offset.zero;
+      } else {
+        // Start a new selection
+        currentStroke.value = Stroke(
+          points: [startPoint, startPoint],
+          color: Colors.blue.withOpacity(0.3),
+          size: 1,
+          strokeType: StrokeType.select,
+        );
+        selectedStrokes.clear();
+      }
+    }
+    if (selectedDrawingTool.value == DrawingTool.text) {
+      textPosition = startPoint;
+      textEditingController.clear();
+      textFocusNode.requestFocus();
+      currentStroke.value = Stroke(
+        points: [startPoint],
+        color: selectedColor.value,
+        size: strokeSize.value,
+        strokeType: selectedDrawingTool.value.strokeType,
+      );
+      update();
     } else {
       currentStroke.value = Stroke(
         points: [startPoint],
@@ -228,31 +254,78 @@ Remember to tailor your approach to the specific subject being discussed, whethe
         strokeType: selectedDrawingTool.value.strokeType,
       );
     }
+
     update();
   }
 
   void onPanUpdate(Offset newPoint) {
-    if (selectedDrawingTool.value == DrawingTool.select &&
-        _selectedStroke != null) {
-      _handleStrokeMove(newPoint);
-    } else if (currentStroke.value != null) {
-      List<Offset> updatedPoints = List.from(currentStroke.value!.points)
-        ..add(newPoint);
-      currentStroke.value = Stroke(
-        points: updatedPoints,
-        color: currentStroke.value!.color,
-        size: currentStroke.value!.size,
-        strokeType: currentStroke.value!.strokeType,
-      );
+    if (selectedDrawingTool.value != DrawingTool.text) {
+      if (currentStroke.value != null) {
+        if (currentStroke.value!.strokeType == StrokeType.select) {
+          if (dragStartPosition.value != null) {
+            final dragOffset = newPoint - dragStartPosition.value!;
+            totalDragOffset.value = totalDragOffset.value! + dragOffset;
+            dragStartPosition.value = newPoint;
+            _updateSelectedStrokesPosition(dragOffset);
+          } else if (currentStroke.value != null) {
+            currentStroke.value = currentStroke.value!.copyWith(
+              points: [currentStroke.value!.points.first, newPoint],
+            );
+            _updateSelectedStrokes();
+          }
+        } else {
+          List<Offset> updatedPoints = List.from(currentStroke.value!.points)
+            ..add(newPoint);
+          currentStroke.value = Stroke(
+            points: updatedPoints,
+            color: currentStroke.value!.color,
+            size: currentStroke.value!.size,
+            strokeType: currentStroke.value!.strokeType,
+          );
+        }
+      }
     }
     // print("up: ${currentStroke.value!.color}");
     update();
   }
 
   void onPanEnd() {
+    if (selectedDrawingTool.value == DrawingTool.text &&
+        textEditingController.text.isNotEmpty &&
+        textPosition != null) {
+      strokes.add(Stroke(
+        points: [textPosition!],
+        color: selectedColor.value,
+        size: strokeSize.value,
+        strokeType: StrokeType.text,
+        text: textEditingController.text,
+      ));
+
+      textEditingController.clear();
+      textFocusNode.unfocus();
+      textPosition = null;
+      update();
+    }
     if (selectedDrawingTool.value == DrawingTool.select) {
-      _selectionStart = null;
-      _selectedStroke = null;
+      dragStartPosition.value = null;
+      totalDragOffset.value = null;
+      currentStroke.value = null;
+    }
+    if (selectedDrawingTool.value == DrawingTool.text &&
+        textEditingController.text.isNotEmpty &&
+        textPosition != null) {
+      strokes.add(Stroke(
+        points: [textPosition!],
+        color: selectedColor.value,
+        size: strokeSize.value,
+        strokeType: StrokeType.text,
+        text: textEditingController.text,
+      ));
+
+      textEditingController.clear();
+      textFocusNode.unfocus();
+      textPosition = null;
+      update();
     } else if (currentStroke.value != null) {
       strokes.add(Stroke(
         points: currentStroke.value!.points,
@@ -284,6 +357,7 @@ Remember to tailor your approach to the specific subject being discussed, whethe
     strokes.clear();
     _undoStack.clear();
     _redoStack.clear();
+    textEditingController.clear();
     update();
   }
 
@@ -291,13 +365,20 @@ Remember to tailor your approach to the specific subject being discussed, whethe
     selectedColor.value = MaterialColor(newColor.value, const {});
   }
 
+  scrollToBottomChat() {
+    try {
+      chatScrollController
+          .jumpTo(chatScrollController.position.maxScrollExtent);
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Future<void> calculate([String? prompt]) async {
     isCalculating.value = true;
     try {
-      // 1. Capture Image from Canvas
       final Uint8List? imageBytes = await _captureCanvasImage();
       if (imageBytes == null) {
-        // Handle error: Canvas image capture failed
         Get.snackbar("Error", "Failed to capture canvas image",
             backgroundColor: Colors.red, colorText: Colors.white);
         return;
@@ -308,7 +389,6 @@ Remember to tailor your approach to the specific subject being discussed, whethe
 
       await getResponse(prompt, imageBytes);
     } catch (e) {
-      // Handle general errors
       print("error: $e");
     } finally {
       isCalculating.value = false;
@@ -329,113 +409,104 @@ Remember to tailor your approach to the specific subject being discussed, whethe
     }
   }
 
-  scrollToBottomChat() {
-    try {
-      chatScrollController
-          .jumpTo(chatScrollController.position.maxScrollExtent);
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  // void chatbotGetResponse(String prompt) {
-  //   isStreaming.value = true;
-  //   try {
-  //     chats.add(Content(role: 'user', parts: [
-  //       Parts(text: prompt),
-  //     ]));
-  //     update();
-  //     scrollToBottomChat();
-  //     gemini.streamChat(chats).listen((value) {
-  //       update();
-  //       if (chats.isNotEmpty && chats.last.role == value.content?.role) {
-  //         chats.last.parts!.last.text =
-  //             '${chats.last.parts!.last.text}${value.output}';
-  //       } else {
-  //         chats.add(Content(role: 'model', parts: [Parts(text: value.output)]));
-  //       }
-  //     }, onDone: () {
-  //       scrollToBottomChat();
-  //       isStreaming.value = false;
-  //     });
-  //   } catch (e) {
-  //     isStreaming.value = false;
-  //     if (chats.last.role == 'user') {
-  //       chats.removeLast();
-  //     }
-  //     Get.snackbar(
-  //       'Error',
-  //       'An error occurred please try again',
-  //       snackPosition: SnackPosition.TOP,
-  //       duration: const Duration(seconds: 3),
-  //       backgroundColor: Colors.red,
-  //       colorText: Colors.white,
-  //     );
-  //   }
-  // }
-
   Future<void> getResponse(String prompt, [Uint8List? imageBytes]) async {
     isStreaming.value = true;
     try {
-      // chats.add(Content("user", [TextPart(prompt)]));
-      update();
-
       if (imageBytes != null) {
         chats.add(Content.data("image/png", imageBytes));
       }
       final chat = model.startChat(history: chats);
       await chat.sendMessage(Content.text(prompt));
-
-      scrollToBottomChat();
-      update();
     } catch (e) {
       print("Error: $e");
     } finally {
       isStreaming.value = false;
-    }
-  }
-
-  //temp
-
-  void _handleSelectionStart(Offset startPoint) {
-    _selectionStart = startPoint;
-    _selectedStroke = null;
-    for (final stroke in strokes.reversed) {
-      // Find a stroke to select
-      final rect = _getStrokeRect(stroke);
-      if (rect.contains(_selectionStart!)) {
-        _selectedStroke = stroke;
-        strokes.value = strokes.map((s) {
-          return s == _selectedStroke
-              ? s.copyWith(isSelected: true)
-              : s.copyWith(isSelected: false);
-        }).toList();
-        break;
-      }
-    }
-    update();
-  }
-
-  void _handleStrokeMove(Offset newPoint) {
-    if (_selectionStart != null && _selectedStroke != null) {
-      final delta = newPoint - _selectionStart!;
-      strokes.value = strokes.map((s) {
-        return s == _selectedStroke ? s.copyWith(offset: delta) : s;
-      }).toList();
-      _selectionStart = newPoint;
+      scrollToBottomChat();
       update();
     }
   }
 
-  Rect _getStrokeRect(Stroke stroke) {
-    final minX =
-        stroke.points.map((p) => p.dx + stroke.offset.dx).reduce(math.min);
-    final maxX =
-        stroke.points.map((p) => p.dx + stroke.offset.dx).reduce(math.max);
-    final minY =
-        stroke.points.map((p) => p.dy + stroke.offset.dy).reduce(math.min);
-    final maxY =
-        stroke.points.map((p) => p.dy + stroke.offset.dy).reduce(math.max);
-    return Rect.fromLTRB(minX, minY, maxX, maxY);
+  void _updateSelectedStrokes() {
+    if (currentStroke.value?.strokeType == StrokeType.select) {
+      final selectionRect = Rect.fromPoints(
+        currentStroke.value!.points.first,
+        currentStroke.value!.points.last,
+      );
+
+      selectedStrokes.value = strokes.where((stroke) {
+        return stroke.points.any((point) => selectionRect.contains(point));
+      }).toList();
+    }
+  }
+
+  void _updateSelectedStrokesPosition(Offset dragOffset) {
+    for (var i = 0; i < selectedStrokes.length; i++) {
+      final stroke = selectedStrokes[i];
+      final updatedPoints =
+          stroke.points.map((point) => point + dragOffset).toList();
+      selectedStrokes[i] = stroke.copyWith(points: updatedPoints);
+
+      final index = strokes.indexWhere((s) => s == stroke);
+      if (index != -1) {
+        strokes[index] = selectedStrokes[i];
+      }
+    }
+  }
+
+  bool _isPointInsideSelectedStrokes(Offset point) {
+    for (final stroke in selectedStrokes) {
+      if (_isPointInsideStroke(point, stroke)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool _isPointInsideStroke(Offset point, Stroke stroke) {
+    switch (stroke.strokeType) {
+      case StrokeType.rectangle:
+      case StrokeType.square:
+        final rect = Rect.fromPoints(stroke.points.first, stroke.points.last);
+        return rect.contains(point);
+      case StrokeType.circle:
+        final center = stroke.points.first;
+        final radius = (stroke.points.last - center).distance;
+        return (point - center).distance <= radius;
+      case StrokeType.line:
+      case StrokeType.pencil:
+      case StrokeType.eraser:
+        return stroke.points
+            .any((strokePoint) => (strokePoint - point).distance < 10);
+      case StrokeType.text:
+        if (stroke.text != null) {
+          final textBounds = _getTextBounds(stroke);
+          return textBounds.contains(point);
+        }
+        return false;
+      default:
+        return false;
+    }
+  }
+
+  Rect _getTextBounds(Stroke stroke) {
+    final textSpan = TextSpan(
+      text: stroke.text,
+      style: TextStyle(fontSize: stroke.size),
+    );
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    return Rect.fromPoints(
+      stroke.points.first,
+      stroke.points.first + Offset(textPainter.width, textPainter.height),
+    );
+  }
+
+  @override
+  void onClose() {
+    textEditingController.dispose();
+    textFocusNode.dispose();
   }
 }

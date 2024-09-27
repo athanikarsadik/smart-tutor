@@ -5,6 +5,7 @@ class Stroke {
   final Color color;
   final double size;
   final StrokeType strokeType;
+  String? text;
   bool isSelected;
   Offset offset;
 
@@ -14,6 +15,7 @@ class Stroke {
     required this.size,
     required this.strokeType,
     this.isSelected = false,
+    this.text,
     this.offset = Offset.zero,
   });
 
@@ -24,6 +26,7 @@ class Stroke {
     StrokeType? strokeType,
     bool? isSelected,
     Offset? offset,
+    String? text,
   }) {
     return Stroke(
       points: points ?? this.points,
@@ -32,30 +35,8 @@ class Stroke {
       strokeType: strokeType ?? this.strokeType,
       isSelected: isSelected ?? this.isSelected,
       offset: offset ?? this.offset,
+      text: text ?? this.text,
     );
-  }
-
-  Stroke.fromJson(Map<String, dynamic> json)
-      : points = (json['points'] as List<dynamic>)
-            .map((point) => Offset(point[0] as double, point[1] as double))
-            .toList(),
-        color = Color(int.parse(json['color'] as String, radix: 16)),
-        size = json['size'] as double,
-        strokeType = StrokeType.values[json['strokeType'] as int],
-        offset = Offset(json['offsetX'] as double? ?? 0.0,
-            json['offsetY'] as double? ?? 0.0),
-        isSelected = json['isSelected'] as bool? ?? false;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'points': points.map((point) => [point.dx, point.dy]).toList(),
-      'color': color.value.toString(),
-      'size': size,
-      'strokeType': strokeType.index,
-      'offsetX': offset.dx,
-      'offsetY': offset.dy,
-      'isSelected': isSelected,
-    };
   }
 }
 
@@ -69,4 +50,5 @@ enum StrokeType {
   circle,
   pencil,
   eraser,
+  text,
 }

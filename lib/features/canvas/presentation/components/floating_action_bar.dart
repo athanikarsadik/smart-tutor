@@ -17,16 +17,16 @@ class FloatingOptionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50.sp,
+      height: 60.sp,
       width: 500.sp,
-      margin: EdgeInsets.all(10.sp),
+      // margin: EdgeInsets.all(10.sp),
       decoration: BoxDecoration(
         color: AppColors.canvasSecondaryColor,
         borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
             blurRadius: 5,
-            color: AppColors.boxShadowColor.withOpacity(0.25),
+            color: AppColors.blackColor.withOpacity(0.25),
             offset: const Offset(0, 5),
             spreadRadius: 0,
           ),
@@ -34,18 +34,6 @@ class FloatingOptionBar extends StatelessWidget {
             blurRadius: 5,
             color: AppColors.boxShadowColor.withOpacity(0.25),
             offset: const Offset(5, 0),
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            blurRadius: 5,
-            color: AppColors.boxShadowColor.withOpacity(0.25),
-            offset: const Offset(-5, 0),
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            blurRadius: 5,
-            color: AppColors.boxShadowColor.withOpacity(0.25),
-            offset: const Offset(0, -5),
             spreadRadius: 0,
           ),
         ],
