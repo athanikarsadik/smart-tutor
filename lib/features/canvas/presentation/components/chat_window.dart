@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:socratica/core/constants/asset_strings.dart';
 import 'package:socratica/features/canvas/presentation/components/widgets/animated_button.dart';
 import 'package:socratica/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
@@ -198,7 +199,13 @@ class ChatDialogSection extends StatelessWidget {
         children: [
           const Expanded(child: ResultsDisplay()),
           SizedBox(height: 10.h),
-          const EnterPromptTextWidget(),
+          Obx(() => Get.find<HomeController>().isStreaming.value
+              ? Lottie.asset(
+                  'assets/lottie/ai.json',
+                  width: 100.w,
+                  height: 100.h,
+                )
+              : const EnterPromptTextWidget()),
         ],
       ),
     );

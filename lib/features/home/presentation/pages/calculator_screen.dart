@@ -95,7 +95,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                                 if (prompt.isEmpty) {
                                   prompt = "?";
                                 }
-                                controller.calculate(prompt);
+                                controller.getResponse(prompt);
                               },
                               child: Container(
                                 decoration: BoxDecoration(

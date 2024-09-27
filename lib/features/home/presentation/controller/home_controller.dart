@@ -374,28 +374,28 @@ Remember to tailor your approach to the specific subject being discussed, whethe
     }
   }
 
-  Future<void> calculate([String? prompt]) async {
-    isCalculating.value = true;
-    try {
-      final Uint8List? imageBytes = await _captureCanvasImage();
-      if (imageBytes == null) {
-        Get.snackbar("Error", "Failed to capture canvas image",
-            backgroundColor: Colors.red, colorText: Colors.white);
-        return;
-      }
+  // Future<void> calculate([String? prompt]) async {
+  //   isCalculating.value = true;
+  //   try {
+  //     final Uint8List? imageBytes = await captureCanvasImage();
+  //     if (imageBytes == null) {
+  //       Get.snackbar("Error", "Failed to capture canvas image",
+  //           backgroundColor: Colors.red, colorText: Colors.white);
+  //       return;
+  //     }
 
-      prompt ??=
-          "Either solve the given problem if solvable or describe the image";
+  //     prompt ??=
+  //         "Either solve the given problem if solvable or describe the image";
 
-      await getResponse(prompt, imageBytes);
-    } catch (e) {
-      print("error: $e");
-    } finally {
-      isCalculating.value = false;
-    }
-  }
+  //     await getResponse(prompt, imageBytes);
+  //   } catch (e) {
+  //     print("error: $e");
+  //   } finally {
+  //     isCalculating.value = false;
+  //   }
+  // }
 
-  Future<Uint8List?> _captureCanvasImage() async {
+  Future<Uint8List?> captureCanvasImage() async {
     try {
       RenderRepaintBoundary boundary = canvasGlobalKey.currentContext!
           .findRenderObject() as RenderRepaintBoundary;
