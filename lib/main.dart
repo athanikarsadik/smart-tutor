@@ -62,11 +62,11 @@ Future<livekit.Room> connectToRoom() async {
         livekit.ConnectOptions(rtcConfiguration: livekit.RTCConfiguration()),
   );
 
-  await room.connect(
-    LIVEKIT_URL,
-    TOKEN,
-    roomOptions: roomOptions,
-  );
+  // await room.connect(
+  //   LIVEKIT_URL,
+  //   TOKEN,
+  //   roomOptions: roomOptions,
+  // );
 
   try {
     await room.localParticipant!.setMicrophoneEnabled(true);

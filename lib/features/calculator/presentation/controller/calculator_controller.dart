@@ -23,8 +23,9 @@ class CalculatorController extends GetxController {
     super.onInit();
 
     model = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
+      model: 'tunedModels/socratic-teacher-fintuned-2-5kvt1y062y8b',
       apiKey: GEMINI_API_KEY,
+      // safetySettings : [],
       generationConfig: GenerationConfig(
           responseMimeType: "text/plain",
           maxOutputTokens: 8192,
@@ -68,88 +69,89 @@ Remember to tailor your approach to the specific subject being discussed, whethe
   // Gemini gemini = Gemini.instance;
 
   final ScrollController chatScrollController = ScrollController();
-  RxList<Content> chats = <Content>[
-    Content("user", [
-      TextPart(
-          "Can you help me understand the insertion sort algorithm? I'm having trouble implementing it.")
-    ]),
-    Content("model", [
-      TextPart(
-          "Of course! Let's explore insertion sort together. To begin, can you describe how you might sort a small pile of papers with numbers written on them?")
-    ]),
-    Content("user", [
-      TextPart(
-          "I guess I'd look through them and put the smallest number on top, then the next smallest, and so on.")
-    ]),
-    Content("model", [
-      TextPart(
-          "That's a good start! You're describing a sorting method, but not quite insertion sort. Let's try a different approach. Imagine you're dealing cards into a sorted hand. How would you insert a new card into its correct position in an already sorted portion of your hand?")
-    ]),
-    Content("user", [
-      TextPart(
-          "I'd compare the new card with the ones in my hand, starting from the right, and slide it in where it fits.")
-    ]),
-    Content("model", [
-      TextPart(
-          "Excellent! You've grasped a key concept of insertion sort. Now, thinking about this in terms of an array of numbers, how might you represent the 'sorted' and 'unsorted' portions of the array as you progress through the sorting process?")
-    ]),
-    Content("user", [
-      TextPart(
-          "I suppose the left side would be sorted, and the right side unsorted. As I go through the array, the sorted portion would grow.")
-    ]),
-    Content("model", [
-      TextPart(
-          "Perfect understanding! Now, let's focus on the process of inserting an element. When you find the correct position for an element in the sorted portion, what needs to happen to the elements that are greater than the one you're inserting?")
-    ]),
-    Content("user", [
-      TextPart(
-          "They need to be moved to the right to make room for the new element.")
-    ]),
-    Content("model", [
-      TextPart(
-          "Exactly right! You're describing the key operations of insertion sort. Now, thinking about implementing this in code, what kind of loop structure might you use to iterate through the array and perform these operations?")
-    ]),
-    Content("user", [
-      TextPart(
-          "I think I'd need two loops. One to go through the whole array, and another to handle the sorting and shifting within the sorted portion.")
-    ]),
-    Content("model", [
-      TextPart(
-          "Great insight! You're on the right track with the nested loop structure. Can you describe in more detail how these two loops would work together? What would be the purpose of each loop, and what would their start and end conditions be?")
-    ]),
-    Content("user", [
-      TextPart(
-          "The outer loop would start from the second element and go to the end of the array. The inner loop would start from the current element of the outer loop and move left, comparing and shifting elements as needed.")
-    ]),
-    Content("model", [
-      TextPart(
-          "Excellent breakdown! You've grasped the core structure of the insertion sort algorithm. Now, let's think about efficiency. In the worst-case scenario, how many comparisons and shifts might you need to perform for each element you're inserting?")
-    ]),
-    Content("user", [
-      TextPart(
-          "In the worst case, I guess I'd need to compare with every element in the sorted portion and shift all of them.")
-    ]),
-    Content("model", [
-      TextPart(
-          "You're absolutely right. Given this worst-case scenario, can you think of a type of input array that would cause insertion sort to perform the maximum number of operations? And how might this affect the algorithm's time complexity?")
-    ]),
-    Content("user", [
-      TextPart(
-          "An array in reverse order would be the worst case. Each element would need to be moved to the beginning. I think this would make the time complexity O(n^2).")
-    ]),
-    Content("model", [
-      TextPart(
-          "Excellent analysis! You've correctly identified both the worst-case scenario and its impact on time complexity. Now, as a final question, can you think of any scenarios where insertion sort might perform better than other sorting algorithms, despite its O(n^2) worst-case time complexity?")
-    ]),
-    Content("user", [
-      TextPart(
-          "Maybe if the array is already mostly sorted? Or if we're dealing with a small number of elements?")
-    ]),
-    Content("model", [
-      TextPart(
-          "Great insights! You've identified key situations where insertion sort can be advantageous. To wrap up our discussion, could you summarize the main steps of the insertion sort algorithm and highlight its strengths and limitations based on what we've explored?")
-    ]),
-  ].obs;
+  RxList<Content> chats = <Content>[].obs;
+  // <Content>[
+  //   Content("user", [
+  //     TextPart(
+  //         "Can you help me understand the insertion sort algorithm? I'm having trouble implementing it.")
+  //   ]),
+  //   Content("model", [
+  //     TextPart(
+  //         "Of course! Let's explore insertion sort together. To begin, can you describe how you might sort a small pile of papers with numbers written on them?")
+  //   ]),
+  //   Content("user", [
+  //     TextPart(
+  //         "I guess I'd look through them and put the smallest number on top, then the next smallest, and so on.")
+  //   ]),
+  //   Content("model", [
+  //     TextPart(
+  //         "That's a good start! You're describing a sorting method, but not quite insertion sort. Let's try a different approach. Imagine you're dealing cards into a sorted hand. How would you insert a new card into its correct position in an already sorted portion of your hand?")
+  //   ]),
+  //   Content("user", [
+  //     TextPart(
+  //         "I'd compare the new card with the ones in my hand, starting from the right, and slide it in where it fits.")
+  //   ]),
+  //   Content("model", [
+  //     TextPart(
+  //         "Excellent! You've grasped a key concept of insertion sort. Now, thinking about this in terms of an array of numbers, how might you represent the 'sorted' and 'unsorted' portions of the array as you progress through the sorting process?")
+  //   ]),
+  //   Content("user", [
+  //     TextPart(
+  //         "I suppose the left side would be sorted, and the right side unsorted. As I go through the array, the sorted portion would grow.")
+  //   ]),
+  //   Content("model", [
+  //     TextPart(
+  //         "Perfect understanding! Now, let's focus on the process of inserting an element. When you find the correct position for an element in the sorted portion, what needs to happen to the elements that are greater than the one you're inserting?")
+  //   ]),
+  //   Content("user", [
+  //     TextPart(
+  //         "They need to be moved to the right to make room for the new element.")
+  //   ]),
+  //   Content("model", [
+  //     TextPart(
+  //         "Exactly right! You're describing the key operations of insertion sort. Now, thinking about implementing this in code, what kind of loop structure might you use to iterate through the array and perform these operations?")
+  //   ]),
+  //   Content("user", [
+  //     TextPart(
+  //         "I think I'd need two loops. One to go through the whole array, and another to handle the sorting and shifting within the sorted portion.")
+  //   ]),
+  //   Content("model", [
+  //     TextPart(
+  //         "Great insight! You're on the right track with the nested loop structure. Can you describe in more detail how these two loops would work together? What would be the purpose of each loop, and what would their start and end conditions be?")
+  //   ]),
+  //   Content("user", [
+  //     TextPart(
+  //         "The outer loop would start from the second element and go to the end of the array. The inner loop would start from the current element of the outer loop and move left, comparing and shifting elements as needed.")
+  //   ]),
+  //   Content("model", [
+  //     TextPart(
+  //         "Excellent breakdown! You've grasped the core structure of the insertion sort algorithm. Now, let's think about efficiency. In the worst-case scenario, how many comparisons and shifts might you need to perform for each element you're inserting?")
+  //   ]),
+  //   Content("user", [
+  //     TextPart(
+  //         "In the worst case, I guess I'd need to compare with every element in the sorted portion and shift all of them.")
+  //   ]),
+  //   Content("model", [
+  //     TextPart(
+  //         "You're absolutely right. Given this worst-case scenario, can you think of a type of input array that would cause insertion sort to perform the maximum number of operations? And how might this affect the algorithm's time complexity?")
+  //   ]),
+  //   Content("user", [
+  //     TextPart(
+  //         "An array in reverse order would be the worst case. Each element would need to be moved to the beginning. I think this would make the time complexity O(n^2).")
+  //   ]),
+  //   Content("model", [
+  //     TextPart(
+  //         "Excellent analysis! You've correctly identified both the worst-case scenario and its impact on time complexity. Now, as a final question, can you think of any scenarios where insertion sort might perform better than other sorting algorithms, despite its O(n^2) worst-case time complexity?")
+  //   ]),
+  //   Content("user", [
+  //     TextPart(
+  //         "Maybe if the array is already mostly sorted? Or if we're dealing with a small number of elements?")
+  //   ]),
+  //   Content("model", [
+  //     TextPart(
+  //         "Great insights! You've identified key situations where insertion sort can be advantageous. To wrap up our discussion, could you summarize the main steps of the insertion sort algorithm and highlight its strengths and limitations based on what we've explored?")
+  //   ]),
+  // ].obs;
 
   final RxList<Map<String, dynamic>> calculationResults =
       <Map<String, dynamic>>[].obs;
