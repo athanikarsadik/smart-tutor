@@ -1,4 +1,4 @@
-name: smart_calculator
+name: socratica
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -46,6 +46,9 @@ dependencies:
   google_generative_ai: ^0.4.6
   image_picker_for_web: ^3.0.5
   livekit_client: ^2.2.5
+  logger: ^2.4.0
+  flutter_svg: ^2.0.10+1
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +76,8 @@ flutter:
     - assets/.env
     - assets/lottie/
     - assets/images/
+    - assets/svg/
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -86,10 +91,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: Spinnaker
+      fonts:
+        - asset: fonts/spinnaker/Spinnaker-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

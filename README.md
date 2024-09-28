@@ -1,4 +1,4 @@
-# smart_calculator
+# socratica
 
 A new Flutter project.
 
