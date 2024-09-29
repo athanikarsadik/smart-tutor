@@ -49,6 +49,8 @@ dependencies:
   logger: ^2.4.0
   flutter_svg: ^2.0.10+1
   google_fonts: ^6.2.1
+  rive: ^0.13.14
+  mesh: ^0.4.1
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +79,7 @@ flutter:
     - assets/lottie/
     - assets/images/
     - assets/svg/
+    - assets/rive/
 
   #   - images/a_dot_ham.jpeg
 

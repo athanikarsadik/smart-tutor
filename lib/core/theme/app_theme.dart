@@ -5,6 +5,8 @@ import 'app_colors.dart';
 class AppTheme {
   static final darkThemeMode = ThemeData.dark().copyWith(
     scaffoldBackgroundColor: AppColors.backgroundColor,
+    primaryColor: AppColors.backgroundColor,
+    brightness: Brightness.dark,
     appBarTheme: const AppBarTheme(backgroundColor: AppColors.backgroundColor),
     textTheme: const TextTheme(
       bodyLarge: TextStyle(fontFamily: 'Spinnaker'),

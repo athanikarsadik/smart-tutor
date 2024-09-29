@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_saver
   flutter_webrtc
+  rive_common
   url_launcher_linux
 )
 

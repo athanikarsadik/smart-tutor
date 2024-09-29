@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:socratica/core/theme/app_theme.dart';
 import 'package:socratica/features/canvas/presentation/pages/canvas_screen.dart';
 import 'package:socratica/features/canvas/presentation/controllers/home_controller.dart';
+import 'package:socratica/features/intro_screen/presentation/pages/intro_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +25,8 @@ class MyApp extends StatelessWidget {
           title: 'Socratica',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.darkThemeMode,
-          home: const DrawingApp(),
+          themeMode: ThemeMode.dark,
+          home: const IntroScreen(),
         );
       },
     );
