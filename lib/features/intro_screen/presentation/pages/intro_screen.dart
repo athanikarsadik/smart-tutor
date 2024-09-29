@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:socratica/features/canvas/presentation/pages/canvas_screen.dart';
+import 'package:socratica/core/routes/routes.dart';
 import 'package:socratica/features/intro_screen/presentation/components/animated_button.dart';
 import 'package:socratica/features/intro_screen/presentation/components/gradient_ball.dart';
 import 'package:socratica/features/intro_screen/presentation/components/gradient_text.dart';
 import 'package:socratica/features/intro_screen/presentation/components/mesh_animation.dart';
 
 class IntroScreen extends StatefulWidget {
-  const IntroScreen({Key? key}) : super(key: key);
+  const IntroScreen({super.key});
 
   @override
-  _IntroScreenState createState() => _IntroScreenState();
+  State<IntroScreen> createState() => _IntroScreenState();
 }
 
 class _IntroScreenState extends State<IntroScreen>
@@ -145,11 +145,7 @@ class _IntroScreenState extends State<IntroScreen>
                 SizedBox(height: 180.h),
                 AnimatedButton(
                   onPressed: () {
-                    Get.to(
-                      DrawingApp(),
-                      transition: Transition.native, // Pre-built transition
-                      duration: const Duration(seconds: 1),
-                    );
+                    Get.toNamed(AppRoutes.homeScreen);
                   },
                   text: 'Get Started',
                 ),

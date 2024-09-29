@@ -6,11 +6,11 @@ class AnimatedButton extends StatefulWidget {
   final VoidCallback onPressed;
   final String text;
 
-  const AnimatedButton({Key? key, required this.onPressed, required this.text})
-      : super(key: key);
+  const AnimatedButton(
+      {super.key, required this.onPressed, required this.text});
 
   @override
-  _AnimatedButtonState createState() => _AnimatedButtonState();
+  State<AnimatedButton> createState() => _AnimatedButtonState();
 }
 
 class _AnimatedButtonState extends State<AnimatedButton>
@@ -19,7 +19,6 @@ class _AnimatedButtonState extends State<AnimatedButton>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<Color?> _shadowColorAnimation;
-  late Animation<AlignmentGeometry> _gradientAnimation;
 
   late Animation<Alignment> _beginAlignment;
   late Animation<Alignment> _endAlignment;
@@ -92,20 +91,23 @@ class _AnimatedButtonState extends State<AnimatedButton>
       TweenSequenceItem(
         tween: ColorListTween(
           begin: [Colors.blueAccent, Colors.pinkAccent],
-          end:const [Colors.pinkAccent, Color.fromARGB(255, 137, 200, 255)],
+          end: const [Colors.pinkAccent, Color.fromARGB(255, 137, 200, 255)],
         ),
         weight: 1,
       ),
       TweenSequenceItem(
         tween: ColorListTween(
-          begin:const [Colors.pinkAccent, Color.fromARGB(255, 137, 200, 255)],
-          end:const [Color.fromARGB(255, 137, 200, 255), Colors.purpleAccent],
+          begin: const [Colors.pinkAccent, Color.fromARGB(255, 137, 200, 255)],
+          end: const [Color.fromARGB(255, 137, 200, 255), Colors.purpleAccent],
         ),
         weight: 1,
       ),
       TweenSequenceItem(
         tween: ColorListTween(
-          begin:const [Color.fromARGB(255, 137, 200, 255), Colors.purpleAccent],
+          begin: const [
+            Color.fromARGB(255, 137, 200, 255),
+            Colors.purpleAccent
+          ],
           end: [Colors.purpleAccent, Colors.blueAccent],
         ),
         weight: 1,

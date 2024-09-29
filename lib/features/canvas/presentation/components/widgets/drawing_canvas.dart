@@ -132,11 +132,6 @@ class _DrawingCanvasPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.stroke;
 
-      if (stroke.strokeType == StrokeType.eraser) {
-        paint.color = AppColors.canvasPrimaryColor;
-        paint.blendMode = BlendMode.clear;
-      }
-
       switch (stroke.strokeType) {
         case StrokeType.select:
           paint.color = AppColors.canvasButtonColor.withOpacity(0.3);
@@ -302,10 +297,8 @@ class _DrawingCanvasPainter extends CustomPainter {
           break;
 
         case StrokeType.eraser:
-          paint.color = AppColors.canvasPrimaryColor;
-          paint.blendMode = BlendMode.clear;
           final path = Path();
-          for (int i = 0; i < currentStroke.points.length - 1; i++) {
+          for (int i = 0; i < currentStroke.points.length; i++) {
             if (i == 0) {
               path.moveTo(
                   currentStroke.points[i].dx, currentStroke.points[i].dy);
@@ -324,7 +317,7 @@ class _DrawingCanvasPainter extends CustomPainter {
 
   void _drawSelectedStrokes(Canvas canvas) {
     final highlightPaint = Paint()
-      ..color = Colors.blue.withOpacity(0.3)
+      ..color = Colors.grey
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
@@ -337,12 +330,12 @@ class _DrawingCanvasPainter extends CustomPainter {
     switch (stroke.strokeType) {
       case StrokeType.pencil:
       case StrokeType.eraser:
-        final path = Path();
-        path.moveTo(stroke.points.first.dx, stroke.points.first.dy);
-        for (final point in stroke.points.skip(1)) {
-          path.lineTo(point.dx, point.dy);
-        }
-        canvas.drawPath(path, paint);
+        // final path = Path();
+        // path.moveTo(stroke.points.first.dx, stroke.points.first.dy);
+        // for (final point in stroke.points.skip(1)) {
+        //   path.lineTo(point.dx, point.dy);
+        // }
+        // canvas.drawPath(path, paint);
         break;
       case StrokeType.line:
         canvas.drawLine(stroke.points.first, stroke.points.last, paint);

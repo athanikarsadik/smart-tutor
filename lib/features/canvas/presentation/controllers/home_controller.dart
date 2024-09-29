@@ -5,14 +5,11 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:socratica/core/extensions/drawing_tool_extension.dart';
-import 'package:socratica/core/theme/app_colors.dart';
 import '../../../../secrets.dart';
 import '../../domain/entities/drawing_tool_entity.dart';
 import '../../domain/entities/stroke_entity.dart';
 
 class HomeController extends GetxController {
-  RxBool isCalculating = false.obs;
-  RxBool isExpanded = false.obs;
   RxBool isStreaming = false.obs;
 
   late GenerativeModel model;
@@ -125,132 +122,164 @@ Remember to tailor your approach to the specific subject being discussed, whethe
   final RxList<Stroke> _redoStack = <Stroke>[].obs;
 
   // Drawing Actions
-  void onPanStart(Offset startPoint) {
-    if (selectedDrawingTool.value == DrawingTool.text) {
-      textPosition = startPoint;
-      textEditingController.clear();
-      textFocusNode.requestFocus();
-      update();
-    }
-    if (selectedDrawingTool.value == DrawingTool.select) {
-      if (selectedStrokes.isNotEmpty &&
-          _isPointInsideSelectedStrokes(startPoint)) {
-        // Start dragging selected strokes
-        dragStartPosition.value = startPoint;
-        totalDragOffset.value = Offset.zero;
-      } else {
-        // Start a new selection
-        currentStroke.value = Stroke(
-          points: [startPoint, startPoint],
-          color: Colors.blue.withOpacity(0.3),
-          size: 1,
-          strokeType: StrokeType.select,
-        );
-        selectedStrokes.clear();
-      }
-    }
-    if (selectedDrawingTool.value == DrawingTool.text) {
-      textPosition = startPoint;
-      textEditingController.clear();
-      textFocusNode.requestFocus();
-      currentStroke.value = Stroke(
-        points: [startPoint],
-        color: selectedColor.value,
-        size: strokeSize.value,
-        strokeType: selectedDrawingTool.value.strokeType,
-      );
-      update();
-    } else {
-      currentStroke.value = Stroke(
-        points: [startPoint],
-        color: selectedDrawingTool.value == DrawingTool.eraser
-            ? AppColors.canvasPrimaryColor
-            : selectedColor.value,
-        size: selectedDrawingTool.value == DrawingTool.eraser
-            ? eraserSize.value
-            : strokeSize.value,
-        strokeType: selectedDrawingTool.value.strokeType,
-      );
-    }
 
+  void onPanStart(Offset startPoint) {
+    switch (selectedDrawingTool.value) {
+      case DrawingTool.eraser:
+        // _handleEraserStart(startPoint);
+        break;
+      case DrawingTool.text:
+        _handleTextStart(startPoint);
+        break;
+      case DrawingTool.select:
+        _handleSelectStart(startPoint);
+        break;
+      default:
+        _handleDefaultStart(startPoint);
+    }
     update();
   }
 
   void onPanUpdate(Offset newPoint) {
-    if (selectedDrawingTool.value != DrawingTool.text) {
-      if (currentStroke.value != null) {
-        if (currentStroke.value!.strokeType == StrokeType.select) {
-          if (dragStartPosition.value != null) {
-            final dragOffset = newPoint - dragStartPosition.value!;
-            totalDragOffset.value = totalDragOffset.value! + dragOffset;
-            dragStartPosition.value = newPoint;
-            _updateSelectedStrokesPosition(dragOffset);
-          } else if (currentStroke.value != null) {
-            currentStroke.value = currentStroke.value!.copyWith(
-              points: [currentStroke.value!.points.first, newPoint],
-            );
-            _updateSelectedStrokes();
-          }
-        } else {
-          List<Offset> updatedPoints = List.from(currentStroke.value!.points)
-            ..add(newPoint);
-          currentStroke.value = Stroke(
-            points: updatedPoints,
-            color: currentStroke.value!.color,
-            size: currentStroke.value!.size,
-            strokeType: currentStroke.value!.strokeType,
-          );
-        }
-      }
+    switch (selectedDrawingTool.value) {
+      case DrawingTool.eraser:
+        // _handleEraserUpdate(newPoint);
+        _eraseStrokes(newPoint);
+        break;
+      case DrawingTool.text:
+        // Do nothing for text on update
+        break;
+      case DrawingTool.select:
+        _handleSelectUpdate(newPoint);
+        break;
+      default:
+        _handleDefaultUpdate(newPoint);
     }
-    // print("up: ${currentStroke.value!.color}");
     update();
   }
 
   void onPanEnd() {
-    if (selectedDrawingTool.value == DrawingTool.text &&
-        textEditingController.text.isNotEmpty &&
-        textPosition != null) {
-      strokes.add(Stroke(
-        points: [textPosition!],
-        color: selectedColor.value,
-        size: strokeSize.value,
-        strokeType: StrokeType.text,
-        text: textEditingController.text,
-      ));
-
-      textEditingController.clear();
-      textFocusNode.unfocus();
-      textPosition = null;
-      update();
+    switch (selectedDrawingTool.value) {
+      case DrawingTool.eraser:
+        // _handleEraserEnd();
+        break;
+      case DrawingTool.text:
+        _handleTextEnd();
+        break;
+      case DrawingTool.select:
+        _handleSelectEnd();
+        break;
+      default:
+        _handleDefaultEnd();
     }
-    if (selectedDrawingTool.value == DrawingTool.select) {
-      dragStartPosition.value = null;
-      totalDragOffset.value = null;
-      currentStroke.value = null;
-    }
-    if (selectedDrawingTool.value == DrawingTool.text &&
-        textEditingController.text.isNotEmpty &&
-        textPosition != null) {
-      strokes.add(Stroke(
-        points: [textPosition!],
-        color: selectedColor.value,
-        size: strokeSize.value,
-        strokeType: StrokeType.text,
-        text: textEditingController.text,
-      ));
+    update();
+  }
 
-      textEditingController.clear();
-      textFocusNode.unfocus();
-      textPosition = null;
-      update();
+  void _eraseStrokes(Offset point) {
+    strokes
+        .removeWhere((stroke) => _doesStrokeIntersectWithEraser(stroke, point));
+  }
+
+  bool _doesStrokeIntersectWithEraser(Stroke stroke, Offset eraserPoint) {
+    for (Offset point in stroke.points) {
+      double distance = (point - eraserPoint).distance;
+      if (distance <= eraserSize.value) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void _handleTextStart(Offset startPoint) {
+    textPosition = startPoint;
+    textEditingController.clear();
+    textFocusNode.requestFocus();
+  }
+
+  void _handleSelectStart(Offset startPoint) {
+    if (selectedStrokes.isNotEmpty &&
+        _isPointInsideSelectedStrokes(startPoint)) {
+      dragStartPosition.value = startPoint;
+      totalDragOffset.value = Offset.zero;
+    } else {
+      currentStroke.value = Stroke(
+        points: [startPoint, startPoint],
+        color: Colors.blue.withOpacity(0.3),
+        size: 1,
+        strokeType: StrokeType.select,
+      );
+      selectedStrokes.clear();
+    }
+  }
+
+  void _handleDefaultStart(Offset startPoint) {
+    currentStroke.value = Stroke(
+      points: [startPoint],
+      color: selectedColor.value,
+      size: strokeSize.value,
+      strokeType: selectedDrawingTool.value.strokeType,
+    );
+  }
+
+  void _handleSelectUpdate(Offset newPoint) {
+    if (dragStartPosition.value != null) {
+      _updateDraggedStrokes(newPoint);
     } else if (currentStroke.value != null) {
+      _updateSelectionArea(newPoint);
+    }
+  }
+
+  void _handleDefaultUpdate(Offset newPoint) {
+    _updateCurrentStroke(newPoint);
+  }
+
+  void _updateCurrentStroke(Offset newPoint) {
+    if (currentStroke.value != null) {
+      List<Offset> updatedPoints = List.from(currentStroke.value!.points)
+        ..add(newPoint);
+      currentStroke.value =
+          currentStroke.value!.copyWith(points: updatedPoints);
+    }
+  }
+
+  void _updateDraggedStrokes(Offset newPoint) {
+    final dragOffset = newPoint - dragStartPosition.value!;
+    totalDragOffset.value = totalDragOffset.value! + dragOffset;
+    dragStartPosition.value = newPoint;
+    _updateSelectedStrokesPosition(dragOffset);
+  }
+
+  void _updateSelectionArea(Offset newPoint) {
+    currentStroke.value = currentStroke.value!.copyWith(
+      points: [currentStroke.value!.points.first, newPoint],
+    );
+    _updateSelectedStrokes();
+  }
+
+  void _handleTextEnd() {
+    if (textEditingController.text.isNotEmpty && textPosition != null) {
       strokes.add(Stroke(
-        points: currentStroke.value!.points,
-        color: currentStroke.value!.color,
-        size: currentStroke.value!.size,
-        strokeType: currentStroke.value!.strokeType,
+        points: [textPosition!],
+        color: selectedColor.value,
+        size: fontSize.value,
+        strokeType: StrokeType.text,
+        text: textEditingController.text,
       ));
+      textEditingController.clear();
+      textFocusNode.unfocus();
+      textPosition = null;
+    }
+  }
+
+  void _handleSelectEnd() {
+    dragStartPosition.value = null;
+    totalDragOffset.value = null;
+    currentStroke.value = null;
+  }
+
+  void _handleDefaultEnd() {
+    if (currentStroke.value != null) {
+      strokes.add(currentStroke.value!);
       currentStroke.value = null;
       _undoStack.clear();
       _redoStack.clear();
@@ -283,36 +312,6 @@ Remember to tailor your approach to the specific subject being discussed, whethe
     selectedColor.value = MaterialColor(newColor.value, const {});
   }
 
-  scrollToBottomChat() {
-    try {
-      // chatScrollController
-      //     .jumpTo(chatScrollController.position.maxScrollExtent);
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  // Future<void> calculate([String? prompt]) async {
-  //   isCalculating.value = true;
-  //   try {
-  //     final Uint8List? imageBytes = await captureCanvasImage();
-  //     if (imageBytes == null) {
-  //       Get.snackbar("Error", "Failed to capture canvas image",
-  //           backgroundColor: Colors.red, colorText: Colors.white);
-  //       return;
-  //     }
-
-  //     prompt ??=
-  //         "Either solve the given problem if solvable or describe the image";
-
-  //     await getResponse(prompt, imageBytes);
-  //   } catch (e) {
-  //     print("error: $e");
-  //   } finally {
-  //     isCalculating.value = false;
-  //   }
-  // }
-
   Future<Uint8List?> captureCanvasImage() async {
     try {
       RenderRepaintBoundary boundary = canvasGlobalKey.currentContext!
@@ -339,7 +338,6 @@ Remember to tailor your approach to the specific subject being discussed, whethe
       print("Error: $e");
     } finally {
       isStreaming.value = false;
-      scrollToBottomChat();
       update();
     }
   }
