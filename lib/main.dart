@@ -6,9 +6,12 @@ import 'package:socratica/core/routes/routes.dart';
 import 'package:socratica/core/theme/app_theme.dart';
 import 'package:socratica/features/canvas/presentation/controllers/home_controller.dart';
 
+import 'features/canvas/presentation/controllers/deepgram_controller.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Get.put(HomeController());
+  Get.put(DeepgramController());
   runApp(const MyApp());
 }
 
