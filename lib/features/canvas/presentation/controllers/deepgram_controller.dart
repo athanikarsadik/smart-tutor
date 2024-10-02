@@ -39,6 +39,10 @@ class DeepgramController extends GetxController {
   }
 
   String get transcript => _transcript.value;
+  set transcript(String value) {
+    _transcript.value = value;
+  }
+
   String get sttStatus => _sttStatus.value;
   bool get isRecording => _isRecording.value;
 
@@ -48,6 +52,7 @@ class DeepgramController extends GetxController {
         _sttStatus.value = 'Listening...';
         _isRecording.value = true;
         _transcript.value = '';
+        print("listening");
 
         Stream<List<int>> micStream =
             await _recorder.startStream(const RecordConfig(
@@ -84,24 +89,22 @@ class DeepgramController extends GetxController {
 
   Future<void> stopListening() async {
     try {
+      await Future.delayed(Duration(seconds: 2));
       _isRecording.value = false;
+      print("processing");
       await _recorder.stop();
       await _deepgramStreamSubscription?.cancel();
       _sttStatus.value = 'Processing...';
-      print("Processing");
-      if (_transcript.value == '') {
+      if (_transcript.value != '') {
         await Get.find<HomeController>().getResponse(_transcript.value);
         String messageText = Get.find<HomeController>().chats.last.parts.last
                 is TextPart
             ? (Get.find<HomeController>().chats.last.parts.last as TextPart)
                 .text
             : 'Sorry I am not able to process, can you please repeate your question?';
-        print("response: $messageText");
         await speak(messageText);
       }
-
       _transcript.value = '';
-
       _sttStatus.value = 'Inactive';
     } catch (e) {
       print("Error: $e");
@@ -112,7 +115,6 @@ class DeepgramController extends GetxController {
     try {
       if (text.isNotEmpty) {
         final res = await _deepgramTTS.speakFromText("$text");
-
         if (kIsWeb) {
           await _audioPlayer.play(BytesSource(res.data));
         }

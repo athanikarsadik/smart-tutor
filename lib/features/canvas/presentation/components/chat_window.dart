@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +8,6 @@ import 'package:socrita/features/canvas/presentation/components/widgets/custom_t
 import 'package:socrita/features/canvas/presentation/pages/expanded_chat_window.dart';
 import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 
-import '../../../../core/constants/asset_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../controllers/deepgram_controller.dart';
 import 'widgets/chat_dialog_section.dart';
@@ -36,6 +33,13 @@ class _ChatWindowState extends State<ChatWindow> {
   final DeepgramController _deepgramController = Get.find<DeepgramController>();
 
   bool _isListening = false;
+  FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.requestFocus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +190,7 @@ class _ChatWindowState extends State<ChatWindow> {
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Obx(() => RawKeyboardListener(
-                            focusNode: FocusNode(),
+                            focusNode: _focusNode,
                             onKey: _handleKeyEvent,
                             child: Focus(
                               autofocus: true,
@@ -201,11 +205,12 @@ class _ChatWindowState extends State<ChatWindow> {
                                       color: AppColors.canvasBorderColor),
                                 ),
                                 child: GestureDetector(
-                                  onTap: () {
+                                  onTap: () async {
                                     if (_deepgramController.isRecording) {
-                                      _deepgramController.stopListening();
+                                      await _deepgramController.stopListening();
                                     } else {
-                                      _deepgramController.startListening();
+                                      await _deepgramController
+                                          .startListening();
                                     }
                                   },
                                   child: SvgPicture.asset(
@@ -231,20 +236,34 @@ class _ChatWindowState extends State<ChatWindow> {
   void _handleKeyEvent(RawKeyEvent event) {
     if (event.physicalKey == PhysicalKeyboardKey.space) {
       if (event is RawKeyDownEvent && !_isListening) {
-        setState(() => _isListening = true);
-        _deepgramController.startListening();
+        _startListening();
       } else if (event is RawKeyUpEvent && _isListening) {
-        setState(() => _isListening = false);
-        _deepgramController.stopListening();
+        _stopListening();
       }
     }
   }
 
+  void _startListening() {
+    setState(() => _isListening = true);
+    _deepgramController.startListening().then((_) {}).catchError((error) {
+      print("Error starting listening: $error");
+      setState(() => _isListening = false);
+    });
+  }
+
+  void _stopListening() {
+    setState(() => _isListening = false);
+    _deepgramController.stopListening().then((_) {}).catchError((error) {
+      print("Error stopping listening: $error");
+    });
+  }
+
   @override
-  void dispose() {
+  void dispose() async {
     if (_isListening) {
-      _deepgramController.stopListening();
+      await _deepgramController.stopListening();
     }
+    _focusNode.dispose();
     super.dispose();
   }
 }
