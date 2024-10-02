@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,13 +22,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fontFamilyFallback = <String>[];
+    fontFamilyFallback.add("Apple Color Emoji");
+
     return ScreenUtilInit(
       designSize: const Size(1920, 1080),
       builder: (context, child) {
         return GetMaterialApp(
           title: 'Socratica',
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.darkThemeMode,
+          theme: AppTheme.darkThemeMode(fontFamilyFallback),
           themeMode: ThemeMode.dark,
           initialRoute: AppRoutes.introScreen,
           getPages: AppRoutes.routes,

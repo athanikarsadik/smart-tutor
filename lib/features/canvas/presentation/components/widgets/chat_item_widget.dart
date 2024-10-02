@@ -23,6 +23,11 @@ class ChatItemWidget extends StatelessWidget {
         ? (content.parts.last as TextPart).text
         : 'Cannot generate data!';
 
+    final messageWithEmojis = messageText.replaceAllMapped(
+      RegExp(r'\\u([0-9a-fA-F]{4})'),
+      (match) => String.fromCharCode(int.parse(match.group(1)!, radix: 16)),
+    );
+
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Row(
@@ -52,7 +57,7 @@ class ChatItemWidget extends StatelessWidget {
                     : userWidth == 0.2
                         ? 0.252.sw
                         : 0.47.sw),
-            margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 8.w),
+            margin: EdgeInsets.symmetric(vertical: 6.w, horizontal: 6.w),
             padding: EdgeInsets.all(10.sp),
             decoration: BoxDecoration(
               color: isUser

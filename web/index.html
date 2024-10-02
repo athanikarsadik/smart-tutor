@@ -9,8 +9,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="socratica">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-  <link rel="icon" type="image/png" href="favicon.png" />
+  <!-- <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png" /> -->
+  
+
+<!-- Favicon -->
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+
   <title>socratica</title>
   <link rel="manifest" href="manifest.json">
   
@@ -113,19 +119,18 @@
         progress += 1;
         progressBar.style.width = `${progress}%`;
         percentage.textContent = `${progress}%`;
-        setTimeout(updateProgress, 50); // Adjust this for smoother/slower progress
+        setTimeout(updateProgress, 50); 
       }
     }
 
     updateProgress();
 
-    // Listen for the Flutter first frame event and hide the loader
+
     window.addEventListener('flutter-first-frame', function() {
-      // Smooth fade-out animation
       loadingContainer.style.animation = 'fadeOut 1s ease-out forwards';
       setTimeout(() => {
         loadingContainer.style.display = 'none';
-      }, 1000); // Match fade-out duration
+      }, 1000); 
     });
   </script>
 

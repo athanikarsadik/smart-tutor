@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:socratica/core/routes/routes.dart';
 import 'package:socratica/features/intro_screen/presentation/components/animated_button.dart';
@@ -99,32 +100,64 @@ class _IntroScreenState extends State<IntroScreen>
             child: Column(
               children: [
                 Center(
-                  child: GradientText(
-                    'Welcome to Socratica',
-                    style: TextStyle(
-                      fontSize: 90.sp,
-                      fontWeight: FontWeight.w900,
-                      shadows: [
-                        Shadow(
-                          blurRadius: 5,
-                          color: const Color.fromARGB(255, 70, 70, 70)
-                              .withOpacity(0.5),
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color.fromARGB(255, 255, 255, 255),
-                        Color.fromARGB(255, 255, 255, 255),
-                        Color.fromARGB(255, 0, 0, 0),
-                      ],
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // GradientText(
+                      //   'Welcome, ',
+                      //   style: TextStyle(
+                      //     fontSize: 100.sp,
+                      //     fontWeight: FontWeight.w900,
+                      //     shadows: [
+                      //       Shadow(
+                      //         blurRadius: 5,
+                      //         color: const Color.fromARGB(255, 70, 70, 70)
+                      //             .withOpacity(0.0),
+                      //         offset: const Offset(0, 4),
+                      //       ),
+                      //     ],
+                      //   ),
+                      //   gradient: const LinearGradient(
+                      //     begin: Alignment.topCenter,
+                      //     end: Alignment.bottomCenter,
+                      //     colors: [
+                      //       Color.fromARGB(255, 255, 255, 255),
+                      //       Color.fromARGB(255, 255, 255, 255),
+                      //       Color.fromARGB(255, 0, 0, 0),
+                      //     ],
+                      //   ),
+                      // ),
+                      SvgPicture.asset(
+                        "assets/svg/logo.svg",
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 30.h),
+                SizedBox(height: 60.h),
+                    GradientText(
+                        'Welcome, ',
+                        style: TextStyle(
+                          fontSize: 100.sp,
+                          fontWeight: FontWeight.w900,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 5,
+                              color: const Color.fromARGB(255, 70, 70, 70)
+                                  .withOpacity(0.0),
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        gradient: const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color.fromARGB(255, 255, 255, 255),
+                            Color.fromARGB(255, 255, 255, 255),
+                            Color.fromARGB(255, 0, 0, 0),
+                          ],
+                        ),
+                      ),
                 Text(
                   'Igniting Minds Through Socratic Learning – Where Questions Lead to Mastery',
                   style: TextStyle(
@@ -142,7 +175,7 @@ class _IntroScreenState extends State<IntroScreen>
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 180.h),
+                SizedBox(height: 160.h),
                 AnimatedButton(
                   onPressed: () {
                     Get.toNamed(AppRoutes.homeScreen);
