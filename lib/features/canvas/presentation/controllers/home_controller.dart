@@ -8,9 +8,11 @@ import 'package:socratica/core/extensions/drawing_tool_extension.dart';
 import '../../../../secrets.dart';
 import '../../domain/entities/drawing_tool_entity.dart';
 import '../../domain/entities/stroke_entity.dart';
+import 'dart:html' as html;
 
 class HomeController extends GetxController {
   RxBool isStreaming = false.obs;
+  RxBool isDownload = false.obs;
 
   late GenerativeModel model;
 
@@ -63,6 +65,7 @@ Remember to tailor your approach to the specific subject being discussed, whethe
   // final ScrollController chatScrollController = ScrollController();
   RxList<Content> chats = <Content>[].obs;
   final Rx<Color> selectedColor = MaterialColor(Colors.cyan.value, {}).obs;
+  final Rx<Color> selectedBgColor = const Color(0xFF212123).obs;
   final RxDouble strokeSize = 5.0.obs;
   final RxDouble eraserSize = 10.0.obs;
   final RxDouble fontSize = 10.0.obs;
@@ -82,13 +85,23 @@ Remember to tailor your approach to the specific subject being discussed, whethe
     Colors.cyanAccent,
   ];
 
+  final List<Color> backgroundColors = [
+    Color(0xFF141414),
+    Color(0xFF212123),
+    Color(0xFF141A1C),
+    Color(0xFF191521),
+    Color(0xFF14171C),
+    Color(0xFF0C1916),
+    Color(0xFF190C0C),
+  ];
+
   final Rx<DrawingTool> selectedDrawingTool = DrawingTool.select.obs;
   final Rx<MainDrawingTool> mainSelectedTool =
       Rx<MainDrawingTool>(MainDrawingTool.selectOptions);
   final Rx<SelectOptions> currentSelectOption =
       Rx<SelectOptions>(SelectOptions.select);
   final Rx<ShapeOptions> currentShapeOption =
-      Rx<ShapeOptions>(ShapeOptions.circle);
+      Rx<ShapeOptions>(ShapeOptions.line);
   final Rx<DrawToolOptions> currentDrawToolOption =
       Rx<DrawToolOptions>(DrawToolOptions.pencil);
 
@@ -304,6 +317,7 @@ Remember to tailor your approach to the specific subject being discussed, whethe
     strokes.clear();
     _undoStack.clear();
     _redoStack.clear();
+    backgroundImage.value = null;
     textEditingController.clear();
     update();
   }
@@ -323,6 +337,57 @@ Remember to tailor your approach to the specific subject being discussed, whethe
     } catch (e) {
       print('Error capturing canvas image: $e');
       return null;
+    }
+  }
+
+  Future<void> exportImage() async {
+    isDownload.value = true;
+    try {
+      Uint8List? imageData = await captureCanvasImage();
+      if (imageData != null) {
+        final blob = html.Blob([imageData]);
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor = html.AnchorElement()
+          ..href = url
+          ..style.display = 'none'
+          ..download = 'canvas_image.png';
+        html.document.body?.children.add(anchor);
+        anchor.click();
+        html.document.body?.children.remove(anchor);
+        html.Url.revokeObjectUrl(url);
+      } else {
+        print('Failed to capture canvas image');
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      isDownload.value = false;
+    }
+  }
+
+  Future<void> importImage() async {
+    final uploadInput = html.FileUploadInputElement()..accept = 'image/*';
+    uploadInput.click();
+
+    await uploadInput.onChange.first;
+    if (uploadInput.files!.isNotEmpty) {
+      final file = uploadInput.files![0];
+      final reader = html.FileReader();
+      reader.readAsArrayBuffer(file);
+
+      await reader.onLoad.first;
+      final result = reader.result as Uint8List;
+
+      // Convert Uint8List to ui.Image
+      final codec = await ui.instantiateImageCodec(result);
+      final frameInfo = await codec.getNextFrame();
+      final image = frameInfo.image;
+
+      // Update the backgroundImage
+      backgroundImage.value = image;
+
+      // Trigger a repaint of the DrawingCanvas
+      update();
     }
   }
 

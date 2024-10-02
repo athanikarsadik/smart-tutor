@@ -15,7 +15,7 @@ enum DrawingTool {
 
 enum SelectOptions {
   select,
-  hand,
+  // hand,
 }
 
 enum ShapeOptions { rectangle, line, square, arrow, circle }
@@ -37,8 +37,8 @@ extension SelectOptionsExtension on SelectOptions {
     switch (this) {
       case SelectOptions.select:
         return "Select";
-      case SelectOptions.hand:
-        return "Hand";
+      // case SelectOptions.hand:
+      //   return "Hand";
     }
   }
 
@@ -46,8 +46,8 @@ extension SelectOptionsExtension on SelectOptions {
     switch (this) {
       case SelectOptions.select:
         return "assets/svg/select.svg";
-      case SelectOptions.hand:
-        return "assets/svg/hand.svg";
+      // case SelectOptions.hand:
+      //   return "assets/svg/hand.svg";
     }
   }
 

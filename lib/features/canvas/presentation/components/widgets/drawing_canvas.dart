@@ -118,7 +118,7 @@ class _DrawingCanvasPainter extends CustomPainter {
           _controller.backgroundImage.value!.width.toDouble(),
           _controller.backgroundImage.value!.height.toDouble(),
         ),
-        Rect.fromLTWH(0, 0, size.width, size.height),
+        Rect.fromLTWH(size.width / 2, size.height / 2, 200, 200),
         Paint(),
       );
     }

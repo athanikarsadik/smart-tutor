@@ -6,12 +6,14 @@ import 'package:socratica/core/theme/app_colors.dart';
 class DrawerOptionRowWidget extends StatelessWidget {
   final String leadingAsset;
   final String title;
+  final bool isLoading;
   final String? hint;
 
   const DrawerOptionRowWidget({
     super.key,
     required this.leadingAsset,
     required this.title,
+    this.isLoading = false,
     this.hint,
   });
 
@@ -23,10 +25,19 @@ class DrawerOptionRowWidget extends StatelessWidget {
       minVerticalPadding: 0,
       dense: true,
       minTileHeight: 20.h,
-      leading: SvgPicture.asset(
-        leadingAsset,
-        height: 20.sp,
-      ),
+      leading: isLoading
+          ? SizedBox(
+              width: 20.sp,
+              height: 20.sp,
+              child: const CircularProgressIndicator(
+                color: AppColors.whiteColor,
+                strokeWidth: 1.5,
+              ),
+            )
+          : SvgPicture.asset(
+              leadingAsset,
+              height: 20.sp,
+            ),
       title: Text(
         title,
         style: TextStyle(
