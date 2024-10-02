@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:socratica/core/extensions/drawing_tool_extension.dart';
-import 'package:socratica/core/theme/app_colors.dart';
+import 'package:socrita/core/extensions/drawing_tool_extension.dart';
+import 'package:socrita/core/theme/app_colors.dart';
 import '../../../domain/entities/stroke_entity.dart';
 import '../../controllers/home_controller.dart';
 import 'dart:math' as math;

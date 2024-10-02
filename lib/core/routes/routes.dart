@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:socratica/features/intro_screen/presentation/pages/intro_screen.dart';
+import 'package:socrita/features/intro_screen/presentation/pages/intro_screen.dart';
 
 import '../../features/canvas/presentation/pages/canvas_screen.dart';
 

@@ -6,11 +6,20 @@ import '../../../../../core/theme/app_colors.dart';
 class CustomTooltip extends StatelessWidget {
   final String message;
   final Widget child;
+  final Duration showDuration;
+  final Duration hideDuration;
+  final Duration waitDuration;
+  final bool preferBelow;
 
   const CustomTooltip({
     super.key,
     required this.message,
     required this.child,
+    this.showDuration = const Duration(milliseconds: 500), 
+    this.hideDuration = const Duration(milliseconds: 200), 
+    this.waitDuration =
+        const Duration(milliseconds: 300), 
+    this.preferBelow = false, 
   });
 
   @override
@@ -22,14 +31,21 @@ class CustomTooltip extends StatelessWidget {
       textStyle: TextStyle(
         color: AppColors.whiteColor,
         fontWeight: FontWeight.w500,
-        fontSize: 12.sp,
+        fontSize: 15.sp,
       ),
       decoration: BoxDecoration(
         color: AppColors.canvasButtonColor,
         borderRadius: BorderRadius.circular(10.r),
       ),
-      preferBelow: false,
-      child: child,
+      preferBelow: preferBelow,
+      showDuration: showDuration, 
+      waitDuration: waitDuration, 
+      triggerMode:
+          TooltipTriggerMode.tap, 
+      child: AnimatedContainer(
+        duration: showDuration,
+        child: child,
+      ),
     );
   }
 }

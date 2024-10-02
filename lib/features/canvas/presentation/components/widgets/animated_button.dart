@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
 
 class AnimatedIconButton extends StatefulWidget {
   final double width;

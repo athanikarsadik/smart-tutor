@@ -1,4 +1,4 @@
-package com.wisnolect.socratica
+package com.wisnolect.socrita
 
 import io.flutter.embedding.android.FlutterActivity
 

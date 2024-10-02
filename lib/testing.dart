@@ -10,7 +10,7 @@ void main() async {
     );
     // Load image from file system and convert to Uint8List
     Uint8List imageBytes = await loadFileAsUint8List(
-        "C:\\Users\\Sadik\\Desktop\\socratica\\assets\\images\\test.png");
+        "C:\\Users\\Sadik\\Desktop\\socrita\\assets\\images\\test.png");
 
     // Define prompt and content (text + image)
     // const prompt = 'what the image contains';

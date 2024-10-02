@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:socratica/core/routes/routes.dart';
-import 'package:socratica/core/theme/app_theme.dart';
-import 'package:socratica/features/canvas/presentation/controllers/home_controller.dart';
+import 'package:socrita/core/routes/routes.dart';
+import 'package:socrita/core/theme/app_theme.dart';
+import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 
 import 'features/canvas/presentation/controllers/deepgram_controller.dart';
 
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       designSize: const Size(1920, 1080),
       builder: (context, child) {
         return GetMaterialApp(
-          title: 'Socratica',
+          title: 'Socrita',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.darkThemeMode(fontFamilyFallback),
           themeMode: ThemeMode.dark,

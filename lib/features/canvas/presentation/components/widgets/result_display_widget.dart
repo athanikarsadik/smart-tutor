@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:socratica/features/canvas/presentation/controllers/home_controller.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/chat_item_widget.dart';
+import 'package:lottie/lottie.dart';
+import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/chat_item_widget.dart';
 
 class ResultsDisplay extends StatefulWidget {
   final double userWidth;

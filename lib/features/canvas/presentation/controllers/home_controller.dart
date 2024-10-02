@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:socratica/core/extensions/drawing_tool_extension.dart';
+import 'package:socrita/core/extensions/drawing_tool_extension.dart';
 import '../../../../secrets.dart';
 import '../../domain/entities/drawing_tool_entity.dart';
 import '../../domain/entities/stroke_entity.dart';
@@ -21,12 +21,12 @@ class HomeController extends GetxController {
     super.onInit();
 
     model = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
+      model: 'gemini-1.5-pro-002',
       apiKey: GEMINI_API_KEY,
       generationConfig: GenerationConfig(
           responseMimeType: "text/plain",
           maxOutputTokens: 8192,
-          topK: 64,
+          topK: 40,
           topP: 0.95,
           temperature: 1),
       systemInstruction: Content(

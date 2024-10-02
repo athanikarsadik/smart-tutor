@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:socratica/core/theme/app_colors.dart';
-import 'package:socratica/features/canvas/presentation/controllers/home_controller.dart';
+import 'package:socrita/core/theme/app_colors.dart';
+import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 
 class AnimatedColorPalette extends StatefulWidget {
   final List<Color> colors;

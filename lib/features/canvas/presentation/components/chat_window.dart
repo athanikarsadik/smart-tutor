@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/animated_button.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
-import 'package:socratica/features/canvas/presentation/pages/expanded_chat_window.dart';
-import 'package:socratica/features/canvas/presentation/controllers/home_controller.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/animated_button.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
+import 'package:socrita/features/canvas/presentation/pages/expanded_chat_window.dart';
+import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 
 import '../../../../core/constants/asset_strings.dart';
 import '../../../../core/theme/app_colors.dart';

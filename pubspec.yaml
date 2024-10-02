@@ -1,4 +1,4 @@
-name: socratica
+name: socrita
 description: "A new Flutter project."
 publish_to: "none"
 
@@ -34,6 +34,7 @@ dependencies:
   audioplayers: ^6.1.0
   path_provider: ^2.1.4
   universal_io: ^2.2.2
+  toastification: ^2.3.0
 
 dev_dependencies:
   flutter_test:

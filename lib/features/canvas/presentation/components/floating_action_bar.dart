@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:socratica/features/canvas/domain/entities/drawing_tool_entity.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/color_drop_down.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
+import 'package:socrita/features/canvas/domain/entities/drawing_tool_entity.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/color_drop_down.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
 
 // import '../../../../core/constants/asset_strings.dart';
 import '../../../../core/theme/app_colors.dart';

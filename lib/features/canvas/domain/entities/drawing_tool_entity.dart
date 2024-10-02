@@ -1,4 +1,4 @@
-// import 'package:socratica/core/constants/asset_strings.dart';
+// import 'package:socrita/core/constants/asset_strings.dart';
 
 enum DrawingTool {
   select,
