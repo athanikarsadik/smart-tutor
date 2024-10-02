@@ -1,4 +1,4 @@
-# socratica
+# socrita
 
 A new Flutter project.
 

@@ -1,42 +1,139 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
-
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="socratica">
+  <meta name="apple-mobile-web-app-title" content="socrita">
   <meta name="mobile-web-app-capable" content="yes">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <!-- <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png" /> -->
+  
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png" />
+<!-- Favicon -->
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
+<link rel="icon" href="favicon.ico" type="image/x-icon">
 
-  <title>socratica</title>
+  <title>socrita</title>
   <link rel="manifest" href="manifest.json">
-</head>
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    
+    .loading-container {
+      width: 350px;
+      text-align: center;
+      animation: fadeIn 1.5s ease-in-out;
+    }
 
+    .progress-bar {
+      width: 100%;
+      height: 30px;
+      background-color: #222;
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .progress {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b6b, #feca57);
+      border-radius: 15px;
+      position: relative;
+      animation: glowing 1.5s infinite;
+    }
+
+    .progress::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 5px;
+      height: 100%;
+      background-color: #fff;
+      filter: blur(5px);
+    }
+
+    .percentage {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    @keyframes glowing {
+      0% { box-shadow: 0 0 10px #ff6b6b; }
+      50% { box-shadow: 0 0 20px #feca57; }
+      100% { box-shadow: 0 0 10px #ff6b6b; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+  </style>
+</head>
 <body>
+  <div class="loading-container">
+    <div class="progress-bar">
+      <div class="progress">
+        <span class="percentage">0%</span>
+      </div>
+    </div>
+    <p style="color: white; font-size: 18px; font-weight: bold;">
+      Loading Socrita...
+    </p>
+  </div>
+
+  <script>
+    let progress = 0;
+    const progressBar = document.querySelector('.progress');
+    const percentage = document.querySelector('.percentage');
+    const loadingContainer = document.querySelector('.loading-container');
+
+    function updateProgress() {
+      if (progress < 100) {
+        progress += 1;
+        progressBar.style.width = `${progress}%`;
+        percentage.textContent = `${progress}%`;
+        setTimeout(updateProgress, 50); 
+      }
+    }
+
+    updateProgress();
+
+
+    window.addEventListener('flutter-first-frame', function() {
+      loadingContainer.style.animation = 'fadeOut 1s ease-out forwards';
+      setTimeout(() => {
+        loadingContainer.style.display = 'none';
+      }, 1000); 
+    });
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
-
 </html>

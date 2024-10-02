@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:socratica/features/canvas/domain/entities/drawing_tool_entity.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/color_drop_down.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
+import 'package:socrita/features/canvas/domain/entities/drawing_tool_entity.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/color_drop_down.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
 
 // import '../../../../core/constants/asset_strings.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -47,7 +47,7 @@ class FloatingOptionBar extends StatelessWidget {
               child: IconWidget(
                 assetName: _controller.currentSelectOption.value.getAsset(),
                 height: 22.sp,
-                isOption: true,
+                isOption: false,
                 message: "Move tools",
                 mainDrawingTool: MainDrawingTool.selectOptions,
               ),
@@ -81,14 +81,14 @@ class FloatingOptionBar extends StatelessWidget {
                 mainDrawingTool: MainDrawingTool.text,
               ),
             ),
-            CustomTooltip(
-              message: "Add page",
-              child: IconWidget(
-                assetName: "assets/svg/add_page.svg",
-                height: 22.sp,
-                message: "Add Page",
-              ),
-            ),
+            // CustomTooltip(
+            //   message: "Add page",
+            //   child: IconWidget(
+            //     assetName: "assets/svg/add_page.svg",
+            //     height: 22.sp,
+            //     message: "Add Page",
+            //   ),
+            // ),
             CustomTooltip(
               message: "Color",
               child: Obx(

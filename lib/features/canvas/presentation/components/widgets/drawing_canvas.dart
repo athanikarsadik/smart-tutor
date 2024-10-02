@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:socratica/core/extensions/drawing_tool_extension.dart';
-import 'package:socratica/core/theme/app_colors.dart';
+import 'package:socrita/core/extensions/drawing_tool_extension.dart';
+import 'package:socrita/core/theme/app_colors.dart';
 import '../../../domain/entities/stroke_entity.dart';
 import '../../controllers/home_controller.dart';
 import 'dart:math' as math;
@@ -118,7 +118,7 @@ class _DrawingCanvasPainter extends CustomPainter {
           _controller.backgroundImage.value!.width.toDouble(),
           _controller.backgroundImage.value!.height.toDouble(),
         ),
-        Rect.fromLTWH(0, 0, size.width, size.height),
+        Rect.fromLTWH(size.width / 2, size.height / 2, 200, 200),
         Paint(),
       );
     }
@@ -131,11 +131,6 @@ class _DrawingCanvasPainter extends CustomPainter {
         ..strokeWidth = stroke.size
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.stroke;
-
-      if (stroke.strokeType == StrokeType.eraser) {
-        paint.color = AppColors.canvasPrimaryColor;
-        paint.blendMode = BlendMode.clear;
-      }
 
       switch (stroke.strokeType) {
         case StrokeType.select:
@@ -302,10 +297,8 @@ class _DrawingCanvasPainter extends CustomPainter {
           break;
 
         case StrokeType.eraser:
-          paint.color = AppColors.canvasPrimaryColor;
-          paint.blendMode = BlendMode.clear;
           final path = Path();
-          for (int i = 0; i < currentStroke.points.length - 1; i++) {
+          for (int i = 0; i < currentStroke.points.length; i++) {
             if (i == 0) {
               path.moveTo(
                   currentStroke.points[i].dx, currentStroke.points[i].dy);
@@ -324,7 +317,7 @@ class _DrawingCanvasPainter extends CustomPainter {
 
   void _drawSelectedStrokes(Canvas canvas) {
     final highlightPaint = Paint()
-      ..color = Colors.blue.withOpacity(0.3)
+      ..color = Colors.grey
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
@@ -337,12 +330,12 @@ class _DrawingCanvasPainter extends CustomPainter {
     switch (stroke.strokeType) {
       case StrokeType.pencil:
       case StrokeType.eraser:
-        final path = Path();
-        path.moveTo(stroke.points.first.dx, stroke.points.first.dy);
-        for (final point in stroke.points.skip(1)) {
-          path.lineTo(point.dx, point.dy);
-        }
-        canvas.drawPath(path, paint);
+        // final path = Path();
+        // path.moveTo(stroke.points.first.dx, stroke.points.first.dy);
+        // for (final point in stroke.points.skip(1)) {
+        //   path.lineTo(point.dx, point.dy);
+        // }
+        // canvas.drawPath(path, paint);
         break;
       case StrokeType.line:
         canvas.drawLine(stroke.points.first, stroke.points.last, paint);

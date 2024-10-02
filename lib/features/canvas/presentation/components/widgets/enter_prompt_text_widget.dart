@@ -1,13 +1,13 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-// import 'package:socratica/core/constants/asset_strings.dart';
-import 'package:socratica/core/theme/app_colors.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
-import 'package:socratica/features/canvas/presentation/controllers/home_controller.dart';
+import 'package:socrita/core/theme/app_colors.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
+import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 
 class EnterPromptTextWidget extends StatefulWidget {
   final int minFlex;
@@ -40,6 +40,37 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
     });
   }
 
+  void _sendPrompt() {
+    var prompt = promptController.text.trim();
+    if (prompt.isNotEmpty) {
+      Get.find<HomeController>().getResponse(prompt, captureCanvasImage);
+    }
+    _removeSelectedImage();
+    promptController.clear();
+  }
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.enter) {
+        if (HardwareKeyboard.instance.isShiftPressed) {
+          final currentText = promptController.text;
+          final selection = promptController.selection;
+          final newText = currentText.replaceRange(
+            selection.start,
+            selection.end,
+            '',
+          );
+          promptController.value = TextEditingValue(
+            text: newText,
+            selection: TextSelection.collapsed(offset: selection.start + 1),
+          );
+        } else {
+          _sendPrompt();
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -65,7 +96,10 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.close, color: AppColors.whiteColor),
+                icon: const Icon(
+                  Icons.close,
+                  color: AppColors.whiteColor,
+                ),
                 onPressed: _removeSelectedImage,
               ),
             ],
@@ -77,50 +111,56 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
             children: [
               Expanded(
                 flex: 11,
-                child: TextField(
-                  controller: promptController,
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                  cursorColor: AppColors.canvasButtonColor,
-                  style: const TextStyle(
-                    color: AppColors.whiteColor,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  maxLines: null,
-                  minLines: 1,
-                  decoration: InputDecoration(
-                    suffixIcon: CustomTooltip(
-                      message: "Add canvas image",
-                      child: IconButton(
-                        onPressed: _captureCanvasImage,
-                        icon: SvgPicture.asset(
-                          "assets/svg/image.svg",
-                          height: 25.sp,
+                child: KeyboardListener(
+                  focusNode: FocusNode(),
+                  onKeyEvent: _handleKeyEvent,
+                  child: TextField(
+                    controller: promptController,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                    cursorColor: AppColors.canvasButtonColor,
+                    style: const TextStyle(
+                      color: AppColors.whiteColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: null,
+                    minLines: 1,
+                    textInputAction: TextInputAction.newline,
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      suffixIcon: CustomTooltip(
+                        message: "Add canvas image",
+                        child: IconButton(
+                          onPressed: _captureCanvasImage,
+                          icon: SvgPicture.asset(
+                            "assets/svg/image.svg",
+                            height: 25.sp,
+                          ),
                         ),
                       ),
-                    ),
-                    hintText: "What's in your mind?",
-                    hintStyle: TextStyle(
-                        color: AppColors.whiteColor.withOpacity(0.5),
-                        fontWeight: FontWeight.w500),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                      borderSide: const BorderSide(
-                        color: AppColors.canvasButtonColor,
-                        width: 2,
+                      hintText: "What's in your mind?",
+                      hintStyle: TextStyle(
+                          color: AppColors.whiteColor.withOpacity(0.5),
+                          fontWeight: FontWeight.w500),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                        borderSide: const BorderSide(
+                          color: AppColors.canvasButtonColor,
+                          width: 2,
+                        ),
                       ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                      borderSide: const BorderSide(
-                        color: AppColors.canvasBorderColor,
-                        width: 0.6,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                        borderSide: const BorderSide(
+                          color: AppColors.canvasBorderColor,
+                          width: 0.6,
+                        ),
                       ),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 12.h,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 12.h,
+                      ),
                     ),
                   ),
                 ),
@@ -139,28 +179,32 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
                     promptController.clear();
                   },
                   child: Container(
-                      height: 70.h,
-                      padding: EdgeInsets.all(12.sp),
-                      decoration: BoxDecoration(
+                    width: 70.h,
+                    height: 70.h,
+                    padding: EdgeInsets.all(10.sp),
+                    decoration: BoxDecoration(
+                      color: promptController.text.trim().isEmpty
+                          ? AppColors.canvasSecondaryColor
+                          : AppColors.canvasButtonColor,
+                      borderRadius: BorderRadius.circular(10.r),
+                      border: Border.all(
+                        width: 0.6,
                         color: promptController.text.trim().isEmpty
-                            ? AppColors.canvasSecondaryColor
-                            : AppColors.canvasButtonColor,
-                        borderRadius: BorderRadius.circular(10.r),
-                        border: Border.all(
-                            width: 0.6,
-                            color: promptController.text.trim().isEmpty
-                                ? AppColors.canvasBorderColor
-                                : Colors.transparent),
+                            ? AppColors.canvasBorderColor
+                            : Colors.transparent,
                       ),
-                      child: SvgPicture.asset(
-                        "assets/svg/send.svg",
-                        height: 25.sp,
-                        colorFilter: ColorFilter.mode(
-                            promptController.text.trim().isNotEmpty
-                                ? AppColors.whiteColor
-                                : AppColors.canvasButtonColor,
-                            BlendMode.srcIn),
-                      )),
+                    ),
+                    child: SvgPicture.asset(
+                      "assets/svg/send.svg",
+                      height: 25.sp,
+                      colorFilter: ColorFilter.mode(
+                        promptController.text.trim().isNotEmpty
+                            ? AppColors.whiteColor
+                            : AppColors.canvasButtonColor,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

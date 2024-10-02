@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:socratica/core/theme/app_colors.dart';
+import 'package:socrita/core/theme/app_colors.dart';
+import 'package:markdown/markdown.dart' as md;
 
 class MarkdownWidget extends StatelessWidget {
   final String messageText;
@@ -16,16 +17,17 @@ class MarkdownWidget extends StatelessWidget {
       softLineBreak: true,
       styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
           p: TextStyle(
-              color: Colors.white,
-              fontSize: 18.0.sp,
-              fontWeight: FontWeight.w600),
+            color: Colors.white,
+            fontSize: 18.0.sp,
+            fontWeight: FontWeight.w400,
+          ),
           codeblockPadding:
               EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
           code: TextStyle(
               color: AppColors.whiteColor,
               fontSize: 18.0.sp,
               height: 2,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
               background: Paint()..color = Colors.transparent),
           h1: TextStyle(
             color: Colors.white,
@@ -66,12 +68,19 @@ class MarkdownWidget extends StatelessWidget {
           listBulletPadding:
               EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
           codeblockAlign: WrapAlignment.center,
-          blockquotePadding: EdgeInsets.all(12.0.sp),
+          blockquotePadding: EdgeInsets.all(10.0.sp),
           blockquoteDecoration: BoxDecoration(
               border:
                   Border.all(color: AppColors.backgroundColor, width: 0.5))),
       selectable: true,
       physics: const NeverScrollableScrollPhysics(),
+      extensionSet: md.ExtensionSet(
+        md.ExtensionSet.gitHubFlavored.blockSyntaxes,
+        <md.InlineSyntax>[
+          md.EmojiSyntax(),
+          ...md.ExtensionSet.gitHubFlavored.inlineSyntaxes
+        ],
+      ),
       data: messageText,
     );
   }

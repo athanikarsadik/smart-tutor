@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/animated_button.dart';
-import 'package:socratica/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
-import 'package:socratica/features/canvas/presentation/pages/expanded_chat_window.dart';
-import 'package:socratica/features/canvas/presentation/controllers/home_controller.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/animated_button.dart';
+import 'package:socrita/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
+import 'package:socrita/features/canvas/presentation/pages/expanded_chat_window.dart';
+import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../controllers/deepgram_controller.dart';
 import 'widgets/chat_dialog_section.dart';
 import 'widgets/custom_drop_down.dart';
 
-class ChatWindow extends StatelessWidget {
+class ChatWindow extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback onChatIconTap;
 
@@ -21,7 +23,23 @@ class ChatWindow extends StatelessWidget {
     required this.onChatIconTap,
   });
 
+  @override
+  State<ChatWindow> createState() => _ChatWindowState();
+}
+
+class _ChatWindowState extends State<ChatWindow> {
   final controller = Get.find<HomeController>();
+
+  final DeepgramController _deepgramController = Get.find<DeepgramController>();
+
+  bool _isListening = false;
+  FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.requestFocus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +84,7 @@ class ChatWindow extends StatelessWidget {
                       AnimatedIconButton(
                           width: 60.w,
                           message: "Chat",
-                          callbackAction: onChatIconTap,
+                          callbackAction: widget.onChatIconTap,
                           height: 60.h,
                           padding: EdgeInsets.all(15.sp),
                           backgroundColor: controller.isChatDialog.value
@@ -79,7 +97,7 @@ class ChatWindow extends StatelessWidget {
                       AnimatedIconButton(
                           width: 70.w,
                           message: "Speak",
-                          callbackAction: onChatIconTap,
+                          callbackAction: widget.onChatIconTap,
                           height: 70.h,
                           padding: EdgeInsets.all(15.sp),
                           backgroundColor: !controller.isChatDialog.value
@@ -108,7 +126,7 @@ class ChatWindow extends StatelessWidget {
                                 backgroundColor: Colors.transparent,
                                 insetPadding: const EdgeInsets.all(0),
                                 child: ExpandedChatWindow(
-                                  onChatIconTap: onChatIconTap,
+                                  onChatIconTap: widget.onChatIconTap,
                                 ),
                               );
                             },
@@ -122,7 +140,7 @@ class ChatWindow extends StatelessWidget {
                   CustomTooltip(
                     message: "Hide",
                     child: IconButton(
-                        onPressed: onClose,
+                        onPressed: widget.onClose,
                         icon: Icon(
                           Icons.keyboard_arrow_down_sharp,
                           color: AppColors.whiteColor,
@@ -145,6 +163,11 @@ class ChatWindow extends StatelessWidget {
                   onChanged: (newValue) {
                     if (newValue != null) {
                       controller.selectedAIModel.value = newValue;
+                      if (newValue == 'socrita-flash') {
+                        controller.changeAIModel(0);
+                      } else {
+                        controller.changeAIModel(1);
+                      }
                     }
                   },
                 ),
@@ -165,27 +188,89 @@ class ChatWindow extends StatelessWidget {
           const Divider(color: AppColors.canvasDividerColor),
           SizedBox(height: 20.h),
           // Chat dialog section
-          Obx(() => controller.isChatDialog.value
-              ? const ChatDialogSection()
-              : Expanded(
-                  child: Center(
-                    child: Container(
-                      padding: EdgeInsets.all(20.sp),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.canvasTernaryColor,
-                          border:
-                              Border.all(color: AppColors.canvasBorderColor)),
-                      child: SvgPicture.asset(
-                        "assets/svg/mic.svg",
-                        colorFilter: const ColorFilter.mode(
-                            AppColors.canvasButtonColor, BlendMode.srcIn),
-                      ),
+          Obx(
+            () => controller.isChatDialog.value
+                ? const ChatDialogSection()
+                : Expanded(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Obx(() => RawKeyboardListener(
+                            focusNode: _focusNode,
+                            onKey: (val) {},
+                            child: Focus(
+                              autofocus: true,
+                              child: Container(
+                                padding: EdgeInsets.all(20.sp),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _deepgramController.isRecording
+                                      ? AppColors.canvasButtonColor
+                                      : AppColors.canvasTernaryColor,
+                                  border: Border.all(
+                                      color: AppColors.canvasBorderColor),
+                                ),
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    if (_deepgramController.isRecording) {
+                                      await _deepgramController.stopListening();
+                                    } else {
+                                      await _deepgramController
+                                          .startListening();
+                                    }
+                                  },
+                                  child: SvgPicture.asset(
+                                    "assets/svg/mic.svg",
+                                    colorFilter: ColorFilter.mode(
+                                        _deepgramController.isRecording
+                                            ? AppColors.whiteColor
+                                            : AppColors.canvasDividerColor,
+                                        BlendMode.srcIn),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )),
                     ),
                   ),
-                )),
+          ),
         ],
       ),
     );
+  }
+
+  // void _handleKeyEvent(RawKeyEvent event) async {
+  //   if (event.physicalKey == PhysicalKeyboardKey.space) {
+  //     if (event is RawKeyDownEvent && !_isListening) {
+  //       setState(() => _isListening = true);
+  //       await _deepgramController.startListening();
+  //     } else if (event is RawKeyUpEvent && _isListening) {
+  //       setState(() => _isListening = false);
+  //       await _deepgramController.stopListening();
+  //     }
+  //   }
+  // }
+
+  // void _startListening() {
+  //   setState(() => _isListening = true);
+  //   _deepgramController.startListening().then((_) {}).catchError((error) {
+  //     print("Error starting listening: $error");
+  //     setState(() => _isListening = false);
+  //   });
+  // }
+
+  // void _stopListening() {
+  //   setState(() => _isListening = false);
+  //   _deepgramController.stopListening().then((_) {}).catchError((error) {
+  //     print("Error stopping listening: $error");
+  //   });
+  // }
+
+  @override
+  void dispose() async {
+    if (_isListening) {
+      await _deepgramController.stopListening();
+    }
+    _focusNode.dispose();
+    super.dispose();
   }
 }
