@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 // import 'package:socrita/core/constants/asset_strings.dart';
 import 'package:socrita/features/canvas/presentation/components/widgets/animated_button.dart';
+import 'package:socrita/features/canvas/presentation/controllers/deepgram_controller.dart';
 import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -125,6 +126,11 @@ class ExpandedChatWindow extends StatelessWidget {
                           onChanged: (newValue) {
                             if (newValue != null) {
                               controller.selectedAIModel.value = newValue;
+                              if (newValue == 'socrita-flash') {
+                                controller.changeAIModel(0);
+                              } else {
+                                controller.changeAIModel(1);
+                              }
                             }
                           },
                         ),
@@ -150,19 +156,39 @@ class ExpandedChatWindow extends StatelessWidget {
                           userWidth: 0.40,
                         )
                       : Expanded(
-                          child: Center(
-                            child: Container(
-                              padding: EdgeInsets.all(20.sp),
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.canvasTernaryColor,
-                                  border: Border.all(
-                                      color: AppColors.canvasBorderColor)),
-                              child: SvgPicture.asset(
-                                "assets/svg/mic.svg",
-                                colorFilter: const ColorFilter.mode(
-                                    AppColors.canvasButtonColor,
-                                    BlendMode.srcIn),
+                          child: Obx(
+                            () => Center(
+                              child: InkWell(
+                                onTap: () async {
+                                  if (Get.find<DeepgramController>()
+                                      .isRecording) {
+                                    await Get.find<DeepgramController>()
+                                        .stopListening();
+                                  } else {
+                                    await Get.find<DeepgramController>()
+                                        .startListening();
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(20.sp),
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Get.find<DeepgramController>()
+                                              .isRecording
+                                          ? AppColors.canvasButtonColor
+                                          : AppColors.canvasTernaryColor,
+                                      border: Border.all(
+                                          color: AppColors.canvasBorderColor)),
+                                  child: SvgPicture.asset(
+                                    "assets/svg/mic.svg",
+                                    colorFilter: ColorFilter.mode(
+                                        Get.find<DeepgramController>()
+                                                .isRecording
+                                            ? AppColors.whiteColor
+                                            : AppColors.canvasDividerColor,
+                                        BlendMode.srcIn),
+                                  ),
+                                ),
                               ),
                             ),
                           ),

@@ -163,6 +163,11 @@ class _ChatWindowState extends State<ChatWindow> {
                   onChanged: (newValue) {
                     if (newValue != null) {
                       controller.selectedAIModel.value = newValue;
+                      if (newValue == 'socrita-flash') {
+                        controller.changeAIModel(0);
+                      } else {
+                        controller.changeAIModel(1);
+                      }
                     }
                   },
                 ),
@@ -191,7 +196,7 @@ class _ChatWindowState extends State<ChatWindow> {
                       alignment: Alignment.bottomCenter,
                       child: Obx(() => RawKeyboardListener(
                             focusNode: _focusNode,
-                            onKey: _handleKeyEvent,
+                            onKey: (val) {},
                             child: Focus(
                               autofocus: true,
                               child: Container(
@@ -233,30 +238,32 @@ class _ChatWindowState extends State<ChatWindow> {
     );
   }
 
-  void _handleKeyEvent(RawKeyEvent event) {
-    if (event.physicalKey == PhysicalKeyboardKey.space) {
-      if (event is RawKeyDownEvent && !_isListening) {
-        _startListening();
-      } else if (event is RawKeyUpEvent && _isListening) {
-        _stopListening();
-      }
-    }
-  }
+  // void _handleKeyEvent(RawKeyEvent event) async {
+  //   if (event.physicalKey == PhysicalKeyboardKey.space) {
+  //     if (event is RawKeyDownEvent && !_isListening) {
+  //       setState(() => _isListening = true);
+  //       await _deepgramController.startListening();
+  //     } else if (event is RawKeyUpEvent && _isListening) {
+  //       setState(() => _isListening = false);
+  //       await _deepgramController.stopListening();
+  //     }
+  //   }
+  // }
 
-  void _startListening() {
-    setState(() => _isListening = true);
-    _deepgramController.startListening().then((_) {}).catchError((error) {
-      print("Error starting listening: $error");
-      setState(() => _isListening = false);
-    });
-  }
+  // void _startListening() {
+  //   setState(() => _isListening = true);
+  //   _deepgramController.startListening().then((_) {}).catchError((error) {
+  //     print("Error starting listening: $error");
+  //     setState(() => _isListening = false);
+  //   });
+  // }
 
-  void _stopListening() {
-    setState(() => _isListening = false);
-    _deepgramController.stopListening().then((_) {}).catchError((error) {
-      print("Error stopping listening: $error");
-    });
-  }
+  // void _stopListening() {
+  //   setState(() => _isListening = false);
+  //   _deepgramController.stopListening().then((_) {}).catchError((error) {
+  //     print("Error stopping listening: $error");
+  //   });
+  // }
 
   @override
   void dispose() async {

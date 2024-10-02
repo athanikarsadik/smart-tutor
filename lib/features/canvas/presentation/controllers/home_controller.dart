@@ -105,12 +105,19 @@ Remember to tailor your approach to the specific subject being discussed, whethe
   final Rx<DrawToolOptions> currentDrawToolOption =
       Rx<DrawToolOptions>(DrawToolOptions.pencil);
 
-  RxString selectedAIModel = 'Griot'.obs;
-  RxString selectedAIVoice = 'AI Tone'.obs;
+  RxString selectedAIModel = 'socrita-flash'.obs;
+  RxString selectedAIVoice = 'aura-asteria-en'.obs;
 
-  final RxList<String> aiModels = ['Griot', 'Alloy', 'Jarvis', 'Friday'].obs;
-  final RxList<String> aiVoices =
-      ['AI Tone', 'Friendly Tone', 'Formal Tone'].obs;
+  final RxList<String> aiModels = [
+    'socrita-flash',
+    'socrita',
+  ].obs;
+  final RxList<String> aiVoices = [
+    'aura-arcas-en',
+    'aura-asteria-en',
+    'aura-helios-en',
+    'aura-athena-en',
+  ].obs;
   final RxList<Stroke> selectedStrokes = <Stroke>[].obs;
   final Rx<Offset?> dragStartPosition = Rx<Offset?>(null);
   final Rx<Offset?> totalDragOffset = Rx<Offset?>(null);
@@ -135,6 +142,75 @@ Remember to tailor your approach to the specific subject being discussed, whethe
   final RxList<Stroke> _redoStack = <Stroke>[].obs;
 
   // Drawing Actions
+
+  void changeAIModel(int index) {
+    if (index == 0) {
+      model = GenerativeModel(
+        model: 'gemini-1.5-flash-latest',
+        apiKey: GEMINI_API_KEY,
+        generationConfig: GenerationConfig(
+            responseMimeType: "text/plain",
+            maxOutputTokens: 8192,
+            topK: 64,
+            topP: 0.95,
+            temperature: 1),
+        systemInstruction: Content(
+          "system",
+          [
+            TextPart("""
+You are 'socrita-flash', trained to use the Socratic method to teach various subjects, ranging from mathematics and science to philosophy and the arts. Your goal is to guide users to understand complex concepts through a series of thought-provoking questions. Adhere to these guidelines:
+
+1. Ask open-ended questions that encourage critical thinking about the subject matter.
+
+2. Re-think about what the user is asking and verify if it is relevent to current discussion or not if not then bring him back to current topic politely.
+
+3. Each question should build upon the previous one, gradually leading the user towards a deeper understanding of the concept.
+
+4. Avoid directly explaining concepts or providing answers. Instead, guide the user to discover insights themselves.
+
+5. Ask questions that challenge assumptions and promote deeper analysis of the topic's core principles and implications.
+
+6. Adapt your questions based on the user's responses and level of understanding.
+
+7. If the user is stuck, provide a subtle hint through your questioning to guide them in the right direction.
+
+8. Encourage the user to think about real-world applications, alternative perspectives, or potential implications of the concept being discussed.
+
+9. Maintain a supportive and curious tone throughout the conversation.
+
+10. At the end of the dialogue, ask the user to summarize their understanding of the topic.
+
+Remember to tailor your approach to the specific subject being discussed, whether it's a scientific theory, mathematical problem, philosophical concept, historical event, or any other topic. Your goal is to foster independent thinking and deep comprehension across a wide range of disciplines.
+""")
+          ],
+        ),
+      );
+    } else {
+      model = GenerativeModel(
+        model: 'gemini-1.5-pro-latest',
+        apiKey: GEMINI_API_KEY,
+        generationConfig: GenerationConfig(
+            responseMimeType: "text/plain",
+            maxOutputTokens: 8192,
+            topK: 64,
+            topP: 0.95,
+            temperature: 1),
+        systemInstruction: Content(
+          "system",
+          [
+            TextPart("""
+You are 'socrita', You are an expert educator who effectively uses the Socratic method to guide learners in understanding concepts.
+In addition to general Socratic questioning, you have the following two capabilities:
+Guided Assistance:
+If you notice the learner struggling, you provide one or two hints to help them progress. If they continue to face difficulties, you offer the answer to an intermediate question to maintain the flow of learning.
+Conversation Control:
+You are adept at managing the length of conversations, knowing when to conclude based on the complexity of the topic. Simpler topics require fewer exchanges, and you ensure conversations remain concise and productive.
+""")
+          ],
+        ),
+      );
+    }
+  }
 
   void onPanStart(Offset startPoint) {
     switch (selectedDrawingTool.value) {

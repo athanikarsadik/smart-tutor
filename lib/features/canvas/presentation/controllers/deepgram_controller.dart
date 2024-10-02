@@ -29,11 +29,6 @@ class DeepgramController extends GetxController {
       'filler_words': false,
       'punctuation': true,
     });
-    _deepgramTTS = Deepgram(DEEPGRAM_API_KEY, baseQueryParams: {
-      'model': 'aura-arcas-en',
-      'encoding': "linear16",
-      'container': "wav",
-    });
     _recorder = AudioRecorder();
     _audioPlayer = AudioPlayer();
   }
@@ -89,8 +84,8 @@ class DeepgramController extends GetxController {
 
   Future<void> stopListening() async {
     try {
-      await Future.delayed(Duration(seconds: 2));
       _isRecording.value = false;
+      await Future.delayed(Duration(seconds: 2));
       print("processing");
       await _recorder.stop();
       await _deepgramStreamSubscription?.cancel();
@@ -114,6 +109,11 @@ class DeepgramController extends GetxController {
   Future<void> speak(String text) async {
     try {
       if (text.isNotEmpty) {
+        _deepgramTTS = Deepgram(DEEPGRAM_API_KEY, baseQueryParams: {
+          'model': Get.find<HomeController>().selectedAIVoice,
+          'encoding': "linear16",
+          'container': "wav",
+        });
         final res = await _deepgramTTS.speakFromText("$text");
         if (kIsWeb) {
           await _audioPlayer.play(BytesSource(res.data));
