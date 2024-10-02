@@ -69,6 +69,7 @@ class DeepgramController extends GetxController {
         _deepgramStreamSubscription = stream.listen((res) {
           if (res.transcript != null && res.transcript!.isNotEmpty) {
             _transcript.value += ' ${res.transcript!}';
+            print("Transcript: ${res.transcript}");
           }
         });
       } else {
@@ -86,6 +87,7 @@ class DeepgramController extends GetxController {
       await _recorder.stop();
       await _deepgramStreamSubscription?.cancel();
       _sttStatus.value = 'Processing...';
+      print("Processing");
       if (_transcript.value == '') {
         await Get.find<HomeController>().getResponse(_transcript.value);
         String messageText = Get.find<HomeController>().chats.last.parts.last
@@ -93,6 +95,7 @@ class DeepgramController extends GetxController {
             ? (Get.find<HomeController>().chats.last.parts.last as TextPart)
                 .text
             : 'Sorry I am not able to process, can you please repeate your question?';
+        print("response: $messageText");
         await speak(messageText);
       }
 

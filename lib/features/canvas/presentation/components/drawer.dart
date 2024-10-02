@@ -22,13 +22,13 @@ class AnimatedDrawer extends StatelessWidget {
         BoxShadow(
           blurRadius: 4,
           color: AppColors.blackColor.withOpacity(0.25),
-          offset: Offset(0, 4),
+          offset: const Offset(0, 4),
           spreadRadius: 0,
         ),
         BoxShadow(
           blurRadius: 4,
           color: AppColors.blackColor.withOpacity(0.25),
-          offset: Offset(4, 0),
+          offset: const Offset(4, 0),
           spreadRadius: 0,
         ),
       ]),
@@ -36,7 +36,7 @@ class AnimatedDrawer extends StatelessWidget {
       curve: Curves.easeInOut,
       child: isOpen
           ? Container(
-              height: 700.h,
+              height: 600.h,
               width: 440.w,
               padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
               decoration: BoxDecoration(
@@ -46,31 +46,37 @@ class AnimatedDrawer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Material(
-                    color: Colors.transparent,
-                    animationDuration: const Duration(milliseconds: 400),
-                    borderRadius: BorderRadius.circular(10.r),
-                    child: InkWell(
-                      onTap: () {},
-                      child: const DrawerOptionRowWidget(
-                        leadingAsset: "assets/svg/file.svg",
-                        title: "Open",
-                        hint: "Ctrl+O",
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20.h,
-                  ),
-                  Material(
-                    color: Colors.transparent,
-                    animationDuration: const Duration(milliseconds: 400),
-                    borderRadius: BorderRadius.circular(10.r),
-                    child: InkWell(
-                      onTap: () {},
-                      child: const DrawerOptionRowWidget(
-                        leadingAsset: "assets/svg/download.svg",
-                        title: "Save to..",
+                  // Material(
+                  //   color: Colors.transparent,
+                  //   animationDuration: const Duration(milliseconds: 400),
+                  //   borderRadius: BorderRadius.circular(10.r),
+                  //   child: InkWell(
+                  //     onTap: () {},
+                  //     child: const DrawerOptionRowWidget(
+                  //       leadingAsset: "assets/svg/file.svg",
+                  //       title: "Open",
+                  //       hint: "Ctrl+O",
+                  //     ),
+                  //   ),
+                  // ),
+                  // SizedBox(
+                  //   height: 20.h,
+                  // ),
+                  Obx(
+                    () => Material(
+                      color: Colors.transparent,
+                      animationDuration: const Duration(milliseconds: 400),
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: InkWell(
+                        onTap: () {
+                          Get.find<HomeController>().exportImage();
+                        },
+                        child: DrawerOptionRowWidget(
+                          leadingAsset: "assets/svg/download.svg",
+                          title: "Export Image",
+                          isLoading:
+                              Get.find<HomeController>().isDownload.value,
+                        ),
                       ),
                     ),
                   ),
@@ -82,31 +88,33 @@ class AnimatedDrawer extends StatelessWidget {
                     animationDuration: const Duration(milliseconds: 400),
                     borderRadius: BorderRadius.circular(15.r),
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () async {
+                        await Get.find<HomeController>().importImage();
+                      },
                       child: const DrawerOptionRowWidget(
                         leadingAsset: "assets/svg/export_png.svg",
-                        title: "Export Image",
+                        title: "Import Image",
                         hint: "Ctrl+Shift+E",
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 20.h,
-                  ),
-                  Material(
-                    color: Colors.transparent,
-                    animationDuration: const Duration(milliseconds: 400),
-                    borderRadius: BorderRadius.circular(10.r),
-                    child: InkWell(
-                      onTap: () {
-                        Get.find<HomeController>().clear();
-                      },
-                      child: const DrawerOptionRowWidget(
-                        leadingAsset: "assets/svg/reset.svg",
-                        title: "Reset the canvas",
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   height: 20.h,
+                  // ),
+                  // Material(
+                  //   color: Colors.transparent,
+                  //   animationDuration: const Duration(milliseconds: 400),
+                  //   borderRadius: BorderRadius.circular(10.r),
+                  //   child: InkWell(
+                  //     onTap: () {
+                  //       Get.find<HomeController>().clear();
+                  //     },
+                  //     child: const DrawerOptionRowWidget(
+                  //       leadingAsset: "assets/svg/reset.svg",
+                  //       title: "Reset the canvas",
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(
                     height: 20.h,
                   ),
@@ -215,20 +223,14 @@ class AnimatedDrawer extends StatelessWidget {
                   ),
                   Flexible(
                     child: AnimatedColorPalette(
-                      colors: [
-                        Colors.grey[800]!,
-                        Colors.grey[900]!,
-                        Colors.indigo[900]!,
-                        Colors.blueGrey[900]!,
-                        Colors.green[900]!,
-                        Colors.brown[900]!,
-                        Colors.white,
-                      ],
+                      colors: Get.find<HomeController>().backgroundColors,
                       onColorSelected: (color) {
-                        print('Selected color: $color');
+                        Get.find<HomeController>().selectedBgColor.value =
+                            color;
+                        Get.find<HomeController>().update();
                       },
                     ),
-                  )
+                  ),
                 ],
               ),
             )
