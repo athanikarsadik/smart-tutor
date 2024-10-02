@@ -3,10 +3,11 @@ import 'package:deepgram_speech_to_text/deepgram_speech_to_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
-import 'package:socrita/secrets.dart';
+
 import 'package:record/record.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
+import 'package:socrita/secrets.dart';
 
 class DeepgramController extends GetxController {
   final RxString _transcript = ''.obs;

@@ -21,12 +21,12 @@ class HomeController extends GetxController {
     super.onInit();
 
     model = GenerativeModel(
-      model: 'gemini-1.5-pro-002',
+      model: 'gemini-1.5-flash-latest',
       apiKey: GEMINI_API_KEY,
       generationConfig: GenerationConfig(
           responseMimeType: "text/plain",
           maxOutputTokens: 8192,
-          topK: 40,
+          topK: 64,
           topP: 0.95,
           temperature: 1),
       systemInstruction: Content(

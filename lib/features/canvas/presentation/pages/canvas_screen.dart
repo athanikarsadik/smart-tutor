@@ -188,12 +188,12 @@ class _DrawingAppState extends State<DrawingApp> {
                   )
                 : Center(
                     child: Padding(
-                      padding: EdgeInsets.all(16.0.sp),
+                      padding: EdgeInsets.all(30.0.sp),
                       child: Text(
                         'This application is designed for desktop web. Please open it on a desktop browser.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontSize: 18.sp, color: AppColors.whiteColor),
+                            fontSize: 40.sp, color: AppColors.whiteColor),
                       ),
                     ),
                   ),
