@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
 import 'package:socrita/core/theme/app_colors.dart';
@@ -55,10 +56,10 @@ class _ResultsDisplayState extends State<ResultsDisplay> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.lightbulb_outline,
-                        color: Colors.amberAccent,
-                        size: 40.sp,
+                      SvgPicture.asset(
+                        "assets/svg/logo_icon.svg",
+                        height: 80.sp,
+                        width: 80.sp,
                       ),
                       SizedBox(height: 10.h),
                       Text(
