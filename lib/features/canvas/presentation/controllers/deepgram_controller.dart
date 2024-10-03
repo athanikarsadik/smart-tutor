@@ -47,7 +47,6 @@ class DeepgramController extends GetxController {
         _sttStatus.value = 'Listening...';
         _isRecording.value = true;
         _transcript.value = '';
-        print("listening");
 
         Stream<List<int>> micStream =
             await _recorder.startStream(const RecordConfig(
@@ -85,8 +84,7 @@ class DeepgramController extends GetxController {
   Future<void> stopListening() async {
     try {
       _isRecording.value = false;
-      await Future.delayed(Duration(seconds: 2));
-      print("processing");
+      await Future.delayed(Duration(seconds: 1));
       await _recorder.stop();
       await _deepgramStreamSubscription?.cancel();
       _sttStatus.value = 'Processing...';

@@ -11,7 +11,7 @@ class CanvasWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<HomeController>(
-      init: HomeController(),
+      init: Get.find<HomeController>(),
       builder: (controller) => RepaintBoundary(
         key: controller.canvasGlobalKey,
         child: Container(

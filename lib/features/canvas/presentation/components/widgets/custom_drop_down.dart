@@ -54,7 +54,8 @@ class CustomDropdownButton extends StatelessWidget {
                     : SizedBox.shrink(),
                 title: Text(
                   value,
-                  style: const TextStyle(color: AppColors.whiteColor),
+                  style:
+                      TextStyle(fontSize: 18.sp, color: AppColors.whiteColor),
                 ),
                 trailing: selectedValue == value
                     ? Icon(
@@ -104,7 +105,8 @@ class CustomDropdownButton extends StatelessWidget {
               children: [
                 Text(
                   selectedValue,
-                  style: const TextStyle(color: AppColors.whiteColor),
+                  style:
+                      TextStyle(color: AppColors.whiteColor, fontSize: 18.sp),
                 ),
                 SizedBox(width: 5.w),
                 Icon(

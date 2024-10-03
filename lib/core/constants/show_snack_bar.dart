@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:toastification/toastification.dart';
 
-void showSnackBar(BuildContext context) {
+void showSnackBar({
+  required ToastificationType type,
+  required String msg,
+}) {
   toastification.show(
-    type: ToastificationType.info,
+    type: type,
     style: ToastificationStyle.flatColored,
-    title: const Text("Copied to Clipboard"),
-    alignment: Alignment.topLeft,
-    autoCloseDuration: const Duration(seconds: 2),
+    title: Text(msg),
+    alignment: Alignment.topRight,
+    autoCloseDuration: const Duration(seconds: 3),
     animationBuilder: (
       context,
       animation,
@@ -20,7 +22,9 @@ void showSnackBar(BuildContext context) {
         child: child,
       );
     },
-    icon: Icon(Icons.copy_outlined),
+    pauseOnHover: true,
+    applyBlurEffect: true,
+    closeOnClick: true,
     borderRadius: BorderRadius.circular(12.0),
     closeButtonShowType: CloseButtonShowType.none,
     dragToClose: true,

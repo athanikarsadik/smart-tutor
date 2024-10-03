@@ -116,6 +116,17 @@ class _ChatWindowState extends State<ChatWindow> {
               Row(
                 children: [
                   CustomTooltip(
+                    message: "Clear Chats",
+                    child: IconButton(
+                        onPressed: controller.chats.clear,
+                        icon: Icon(
+                          Icons.delete_forever,
+                          color: AppColors.whiteColor,
+                          size: 30.sp,
+                          weight: 2,
+                        )),
+                  ),
+                  CustomTooltip(
                     message: "Expand",
                     child: IconButton(
                         onPressed: () {

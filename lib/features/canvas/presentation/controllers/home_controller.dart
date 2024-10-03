@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:socrita/core/constants/show_snack_bar.dart';
 import 'package:socrita/core/extensions/drawing_tool_extension.dart';
+import 'package:socrita/features/canvas/domain/entities/chat_message_entity.dart';
+import 'package:socrita/features/canvas/domain/usecase/send_chat_message.dart';
+import 'package:toastification/toastification.dart';
 import '../../../../secrets.dart';
 import '../../domain/entities/drawing_tool_entity.dart';
 import '../../domain/entities/stroke_entity.dart';
@@ -15,6 +19,10 @@ class HomeController extends GetxController {
   RxBool isDownload = false.obs;
 
   late GenerativeModel model;
+
+  final SendChatMessage sendChatMessage;
+
+  HomeController({required this.sendChatMessage});
 
   @override
   void onInit() {
@@ -64,6 +72,8 @@ Remember to tailor your approach to the specific subject being discussed, whethe
 
   // final ScrollController chatScrollController = ScrollController();
   RxList<Content> chats = <Content>[].obs;
+  RxList<ChatMessageEntity> newChats = <ChatMessageEntity>[].obs;
+
   final Rx<Color> selectedColor = MaterialColor(Colors.cyan.value, {}).obs;
   final Rx<Color> selectedBgColor = const Color(0xFF212123).obs;
   final RxDouble strokeSize = 5.0.obs;
@@ -85,7 +95,7 @@ Remember to tailor your approach to the specific subject being discussed, whethe
     Colors.cyanAccent,
   ];
 
-  final List<Color> backgroundColors = [
+  final List<Color> backgroundColors = const [
     Color(0xFF141414),
     Color(0xFF212123),
     Color(0xFF141A1C),
@@ -411,7 +421,7 @@ You are adept at managing the length of conversations, knowing when to conclude 
           await image.toByteData(format: ui.ImageByteFormat.png);
       return byteData?.buffer.asUint8List();
     } catch (e) {
-      print('Error capturing canvas image: $e');
+      showSnackBar(type: ToastificationType.error, msg: e.toString());
       return null;
     }
   }
@@ -435,7 +445,7 @@ You are adept at managing the length of conversations, knowing when to conclude 
         print('Failed to capture canvas image');
       }
     } catch (e) {
-      print(e);
+      showSnackBar(type: ToastificationType.error, msg: e.toString());
     } finally {
       isDownload.value = false;
     }
@@ -476,11 +486,39 @@ You are adept at managing the length of conversations, knowing when to conclude 
       final chat = model.startChat(history: chats);
       await chat.sendMessage(Content.text(prompt));
     } catch (e) {
-      print("Error: $e");
+      showSnackBar(type: ToastificationType.error, msg: e.toString());
     } finally {
       isStreaming.value = false;
+
       update();
     }
+  }
+
+  Future<void> sendMessage(String text, {Uint8List? imageBytes}) async {
+    isStreaming.value = true;
+
+    final chatMessage = ChatMessageEntity(
+      role: 'user',
+      image: imageBytes,
+      text: text,
+    );
+
+    newChats.add(chatMessage);
+
+    final result = await sendChatMessage(
+        chatMessage.copyWith(role: selectedAIModel.value));
+
+    result.fold(
+      (failure) {
+        showSnackBar(type: ToastificationType.error, msg: failure.message);
+      },
+      (updatedMessage) {
+        newChats.add(updatedMessage);
+      },
+    );
+
+    isStreaming.value = false;
+    update();
   }
 
   void _updateSelectedStrokes() {

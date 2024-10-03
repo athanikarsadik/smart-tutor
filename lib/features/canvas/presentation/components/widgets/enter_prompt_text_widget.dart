@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -174,6 +172,8 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
                     if (prompt.isNotEmpty) {
                       Get.find<HomeController>()
                           .getResponse(prompt, captureCanvasImage);
+                      // Get.find<HomeController>()
+                      //     .sendMessage(prompt, imageBytes: captureCanvasImage);
                     }
                     _removeSelectedImage();
                     promptController.clear();

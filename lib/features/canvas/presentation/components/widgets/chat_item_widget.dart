@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +7,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:socrita/core/constants/show_snack_bar.dart';
 import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 import 'package:lottie/lottie.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import 'expandable_text_widget.dart';
@@ -53,8 +52,8 @@ class ChatItemWidget extends StatelessWidget {
           for (int i = 0; i < content.parts.length; i++)
             if (content.parts[i] is TextPart)
               _buildTextPart(content.parts[i] as TextPart, isUser, context)
-            else if (content.parts[i] is Uint8List)
-              _buildImagePart(content.parts[i] as Uint8List, isUser),
+            else if (content.parts[i] is DataPart)
+              _buildImagePart(content.parts[i] as DataPart, isUser),
         ],
       ),
     );
@@ -103,7 +102,9 @@ class ChatItemWidget extends StatelessWidget {
                   icon: Icon(Icons.copy, size: 18.sp, color: Colors.white70),
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: messageWithEmojis));
-                    showSnackBar(context);
+                    showSnackBar(
+                        type: ToastificationType.success,
+                        msg: "Message copied to clipboard!");
                   }),
             ),
         ],
@@ -111,7 +112,7 @@ class ChatItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildImagePart(Uint8List imageData, bool isUser) {
+  Widget _buildImagePart(DataPart imageData, bool isUser) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 6.w, horizontal: 6.w),
       padding: EdgeInsets.all(10.sp),
@@ -127,7 +128,7 @@ class ChatItemWidget extends StatelessWidget {
         ),
       ),
       child: Image.memory(
-        imageData,
+        imageData.bytes,
         fit: BoxFit.cover,
         height: 200.h,
       ),

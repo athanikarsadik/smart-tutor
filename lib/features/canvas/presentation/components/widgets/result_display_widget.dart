@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
+import 'package:socrita/core/theme/app_colors.dart';
 import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 import 'package:socrita/features/canvas/presentation/components/widgets/chat_item_widget.dart';
 
@@ -49,12 +51,34 @@ class _ResultsDisplayState extends State<ResultsDisplay> {
       builder: (controller) {
         return Obx(
           () => controller.chats.isEmpty
-              ? const Center(
-                  child: Text(
-                    "Hello Buddy!\nAsk me anything, I'm here to help you!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.grey, fontWeight: FontWeight.w700),
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.lightbulb_outline,
+                        color: Colors.amberAccent,
+                        size: 40.sp,
+                      ),
+                      SizedBox(height: 10.h),
+                      Text(
+                        "\"Knowledge is a journey of inquiry. \nWhat wonders do you wish to explore?\"",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.whiteColor.withOpacity(0.5),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 22.sp,
+                          fontStyle: FontStyle.italic,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 10.r,
+                              color: Colors.black38,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 )
               : ListView.builder(
