@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:socrita/features/canvas/presentation/components/widgets/animated_button.dart';
 import 'package:socrita/features/canvas/presentation/components/widgets/custom_tool_tip_widget.dart';
 import 'package:socrita/features/canvas/presentation/pages/expanded_chat_window.dart';
@@ -118,7 +119,7 @@ class _ChatWindowState extends State<ChatWindow> {
                   CustomTooltip(
                     message: "Clear Chats",
                     child: IconButton(
-                        onPressed: controller.chats.clear,
+                        onPressed: controller.newChats.clear,
                         icon: Icon(
                           Icons.delete_forever,
                           color: AppColors.whiteColor,
@@ -205,42 +206,61 @@ class _ChatWindowState extends State<ChatWindow> {
                 : Expanded(
                     child: Align(
                       alignment: Alignment.bottomCenter,
-                      child: Obx(() => RawKeyboardListener(
-                            focusNode: _focusNode,
-                            onKey: (val) {},
-                            child: Focus(
-                              autofocus: true,
-                              child: Container(
-                                padding: EdgeInsets.all(20.sp),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: _deepgramController.isRecording
-                                      ? AppColors.canvasButtonColor
-                                      : AppColors.canvasTernaryColor,
-                                  border: Border.all(
-                                      color: AppColors.canvasBorderColor),
-                                ),
-                                child: GestureDetector(
-                                  onTap: () async {
-                                    if (_deepgramController.isRecording) {
-                                      await _deepgramController.stopListening();
-                                    } else {
-                                      await _deepgramController
-                                          .startListening();
-                                    }
-                                  },
-                                  child: SvgPicture.asset(
-                                    "assets/svg/mic.svg",
-                                    colorFilter: ColorFilter.mode(
-                                        _deepgramController.isRecording
-                                            ? AppColors.whiteColor
-                                            : AppColors.canvasDividerColor,
-                                        BlendMode.srcIn),
-                                  ),
-                                ),
+                      child: Obx(() {
+                        Widget animationWidget;
+                        switch (_deepgramController.sttStatus) {
+                          case 'Listening':
+                            animationWidget =
+                                Lottie.asset('assets/lottie/ai.json');
+                            break;
+                          case 'Processing':
+                            animationWidget =
+                                Lottie.asset('assets/lottie/streaming.json');
+                            break;
+                          case 'Speaking':
+                            animationWidget =
+                                Lottie.asset('assets/lottie/ai.json');
+                            break;
+                          default:
+                            animationWidget = SvgPicture.asset(
+                              "assets/svg/mic.svg",
+                              colorFilter: const ColorFilter.mode(
+                                AppColors.canvasDividerColor,
+                                BlendMode.srcIn,
+                              ),
+                            );
+                        }
+
+                        return KeyboardListener(
+                          focusNode: _focusNode,
+                          onKeyEvent: _handleKeyEvent,
+                          child: Focus(
+                            autofocus: true,
+                            child: Container(
+                              padding: EdgeInsets.all(20.sp),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _deepgramController.isRecording
+                                    ? AppColors.canvasButtonColor
+                                    : AppColors.canvasTernaryColor,
+                                border: Border.all(
+                                    color: AppColors.canvasBorderColor),
+                              ),
+                              child: GestureDetector(
+                                onTap: () async {
+                                  print("${_deepgramController.isRecording}");
+                                  if (_deepgramController.isRecording) {
+                                    await _deepgramController.stopListening();
+                                  } else {
+                                    await _deepgramController.startListening();
+                                  }
+                                },
+                                child: animationWidget,
                               ),
                             ),
-                          )),
+                          ),
+                        );
+                      }),
                     ),
                   ),
           ),
@@ -249,17 +269,17 @@ class _ChatWindowState extends State<ChatWindow> {
     );
   }
 
-  // void _handleKeyEvent(RawKeyEvent event) async {
-  //   if (event.physicalKey == PhysicalKeyboardKey.space) {
-  //     if (event is RawKeyDownEvent && !_isListening) {
-  //       setState(() => _isListening = true);
-  //       await _deepgramController.startListening();
-  //     } else if (event is RawKeyUpEvent && _isListening) {
-  //       setState(() => _isListening = false);
-  //       await _deepgramController.stopListening();
-  //     }
-  //   }
-  // }
+  void _handleKeyEvent(KeyEvent event) async {
+    if (event.physicalKey == PhysicalKeyboardKey.space) {
+      if (event is KeyDownEvent && !_isListening) {
+        setState(() => _isListening = true);
+        await _deepgramController.startListening();
+      } else if (event is KeyUpEvent && _isListening) {
+        setState(() => _isListening = false);
+        await _deepgramController.stopListening();
+      }
+    }
+  }
 
   // void _startListening() {
   //   setState(() => _isListening = true);

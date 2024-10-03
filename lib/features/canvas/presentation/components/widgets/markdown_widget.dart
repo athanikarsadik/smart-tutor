@@ -19,7 +19,7 @@ class MarkdownWidget extends StatelessWidget {
           p: TextStyle(
             color: Colors.white,
             fontSize: 18.0.sp,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w200,
           ),
           codeblockPadding:
               EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),

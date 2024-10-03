@@ -41,6 +41,7 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
   void _sendPrompt() {
     var prompt = promptController.text.trim();
     if (prompt.isNotEmpty) {
+      // Get.find<HomeController>().getResponse(prompt, captureCanvasImage);
       Get.find<HomeController>().getResponse(prompt, captureCanvasImage);
     }
     _removeSelectedImage();
@@ -103,7 +104,7 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
             ],
           ),
         ConstrainedBox(
-          constraints: BoxConstraints(minHeight: 70.h, maxHeight: 120.h),
+          constraints: BoxConstraints(minHeight: 80.h, maxHeight: 130.h),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -157,7 +158,7 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
                       ),
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: 16.w,
-                        vertical: 12.h,
+                        vertical: 30.h,
                       ),
                     ),
                   ),
@@ -165,7 +166,7 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
               ),
               SizedBox(width: 10.w),
               Expanded(
-                flex: widget.minFlex,
+                flex: 2,
                 child: InkWell(
                   onTap: () {
                     var prompt = promptController.text.trim();
@@ -179,9 +180,9 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
                     promptController.clear();
                   },
                   child: Container(
-                    width: 70.h,
-                    height: 70.h,
-                    padding: EdgeInsets.all(10.sp),
+                    width: 70.sp,
+                    height: 70.sp,
+                    padding: EdgeInsets.all(15.sp),
                     decoration: BoxDecoration(
                       color: promptController.text.trim().isEmpty
                           ? AppColors.canvasSecondaryColor
@@ -196,7 +197,7 @@ class _EnterPromptTextWidgetState extends State<EnterPromptTextWidget> {
                     ),
                     child: SvgPicture.asset(
                       "assets/svg/send.svg",
-                      height: 25.sp,
+                      height: 20.sp,
                       colorFilter: ColorFilter.mode(
                         promptController.text.trim().isNotEmpty
                             ? AppColors.whiteColor

@@ -103,7 +103,7 @@ class ExpandedChatWindow extends StatelessWidget {
                           CustomTooltip(
                             message: "Clear Chats",
                             child: IconButton(
-                                onPressed: controller.chats.clear,
+                                onPressed: controller.newChats.clear,
                                 icon: Icon(
                                   Icons.delete_forever,
                                   color: AppColors.whiteColor,

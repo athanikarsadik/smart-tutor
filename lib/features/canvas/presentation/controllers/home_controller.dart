@@ -71,7 +71,7 @@ Remember to tailor your approach to the specific subject being discussed, whethe
   }
 
   // final ScrollController chatScrollController = ScrollController();
-  RxList<Content> chats = <Content>[].obs;
+  // RxList<Content> chats = <Content>[].obs;
   RxList<ChatMessageEntity> newChats = <ChatMessageEntity>[].obs;
 
   final Rx<Color> selectedColor = MaterialColor(Colors.cyan.value, {}).obs;
@@ -477,24 +477,24 @@ You are adept at managing the length of conversations, knowing when to conclude 
     }
   }
 
-  Future<void> getResponse(String prompt, [Uint8List? imageBytes]) async {
-    isStreaming.value = true;
-    try {
-      if (imageBytes != null) {
-        chats.add(Content.data("image/png", imageBytes));
-      }
-      final chat = model.startChat(history: chats);
-      await chat.sendMessage(Content.text(prompt));
-    } catch (e) {
-      showSnackBar(type: ToastificationType.error, msg: e.toString());
-    } finally {
-      isStreaming.value = false;
+  // Future<void> getResponse(String prompt, [Uint8List? imageBytes]) async {
+  //   isStreaming.value = true;
+  //   try {
+  //     if (imageBytes != null) {
+  //       chats.add(Content.data("image/png", imageBytes));
+  //     }
+  //     final chat = model.startChat(history: chats);
+  //     await chat.sendMessage(Content.text(prompt));
+  //   } catch (e) {
+  //     showSnackBar(type: ToastificationType.error, msg: e.toString());
+  //   } finally {
+  //     isStreaming.value = false;
 
-      update();
-    }
-  }
+  //     update();
+  //   }
+  // }
 
-  Future<void> sendMessage(String text, {Uint8List? imageBytes}) async {
+  Future<void> getResponse(String text, [Uint8List? imageBytes]) async {
     isStreaming.value = true;
 
     final chatMessage = ChatMessageEntity(
@@ -504,6 +504,8 @@ You are adept at managing the length of conversations, knowing when to conclude 
     );
 
     newChats.add(chatMessage);
+
+    await Future.delayed(Duration(seconds: 3));
 
     final result = await sendChatMessage(
         chatMessage.copyWith(role: selectedAIModel.value));
@@ -518,7 +520,7 @@ You are adept at managing the length of conversations, knowing when to conclude 
     );
 
     isStreaming.value = false;
-    update();
+    // update();
   }
 
   void _updateSelectedStrokes() {

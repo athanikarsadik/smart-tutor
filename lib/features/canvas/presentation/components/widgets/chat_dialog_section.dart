@@ -24,8 +24,8 @@ class ChatDialogSection extends StatelessWidget {
           Obx(() => Get.find<HomeController>().isStreaming.value
               ? Lottie.asset(
                   'assets/lottie/ai.json',
-                  width: 100.w,
-                  height: 100.h,
+                  width: 200.w,
+                  height: 200.h,
                 )
               : const EnterPromptTextWidget()),
         ],

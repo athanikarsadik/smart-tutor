@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:deepgram_speech_to_text/deepgram_speech_to_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
 
 import 'package:record/record.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -33,6 +32,7 @@ class DeepgramController extends GetxController {
     });
     _recorder = AudioRecorder();
     _audioPlayer = AudioPlayer();
+    _setupAudioPlayerListeners();
   }
 
   String get transcript => _transcript.value;
@@ -42,6 +42,18 @@ class DeepgramController extends GetxController {
 
   String get sttStatus => _sttStatus.value;
   bool get isRecording => _isRecording.value;
+
+  void _setupAudioPlayerListeners() {
+    _audioPlayer.onPlayerComplete.listen((_) {
+      _sttStatus.value = 'Inactive';
+    });
+
+    _audioPlayer.onPlayerStateChanged.listen((PlayerState state) {
+      if (state == PlayerState.completed) {
+        _sttStatus.value = 'Inactive';
+      }
+    });
+  }
 
   Future<void> startListening() async {
     try {
@@ -57,6 +69,8 @@ class DeepgramController extends GetxController {
           sampleRate: 16000,
           numChannels: 1,
         ));
+
+        print(sttStatus);
 
         final streamParams = {
           'detect_language': false,
@@ -88,44 +102,49 @@ class DeepgramController extends GetxController {
     try {
       _isRecording.value = false;
       _sttStatus.value = 'Processing';
+
+      print(sttStatus);
       // await Future.delayed(const Duration(seconds: 1));
       await _recorder.stop();
       await _deepgramStreamSubscription?.cancel();
       if (_transcript.value != '') {
+        print("hey");
         await Get.find<HomeController>().getResponse(_transcript.value);
-        String messageText = Get.find<HomeController>().chats.last.parts.last
-                is TextPart
-            ? (Get.find<HomeController>().chats.last.parts.last as TextPart)
-                .text
-            : 'Sorry I am not able to process, can you please repeate your question?';
+        String messageText = Get.find<HomeController>().newChats.last.text;
+
+        // ? (Get.find<HomeController>().chats.last.parts.last as TextPart)
+        //     .text
+        // : 'Sorry I am not able to process, can you please repeate your question?';
         await speak(messageText);
+      } else {
+        _sttStatus.value = 'Inactive';
       }
       _transcript.value = '';
     } catch (e) {
       print("Error: $e");
-    } finally {
-      _sttStatus.value = 'Inactive';
     }
   }
 
   Future<void> speak(String text) async {
     try {
+      print("print");
       if (text.isNotEmpty) {
         _deepgramTTS = Deepgram(DEEPGRAM_API_KEY, baseQueryParams: {
           'model': Get.find<HomeController>().selectedAIVoice,
           'encoding': "linear16",
           'container': "wav",
         });
+        print("print");
         final res = await _deepgramTTS.speakFromText("$text");
         _sttStatus.value = 'Speaking';
+
+        print(sttStatus);
         if (kIsWeb) {
           await _audioPlayer.play(BytesSource(res.data));
         }
       }
     } catch (e) {
       print('Error in TTS: $e');
-    } finally {
-      _sttStatus.value = 'Inactive';
     }
   }
 
