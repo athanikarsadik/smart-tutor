@@ -5,9 +5,6 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
   connectivity_plus
-  file_saver
-  flutter_webrtc
-  livekit_client
   record_windows
   rive_common
   url_launcher_windows

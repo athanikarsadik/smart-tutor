@@ -6,8 +6,10 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 
 import 'package:record/record.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:socrita/core/constants/show_snack_bar.dart';
 import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 import 'package:socrita/secrets.dart';
+import 'package:toastification/toastification.dart';
 
 class DeepgramController extends GetxController {
   final RxString _transcript = ''.obs;
@@ -44,7 +46,7 @@ class DeepgramController extends GetxController {
   Future<void> startListening() async {
     try {
       if (await _recorder.hasPermission()) {
-        _sttStatus.value = 'Listening...';
+        _sttStatus.value = 'Listening';
         _isRecording.value = true;
         _transcript.value = '';
 
@@ -77,17 +79,17 @@ class DeepgramController extends GetxController {
         // Request microphone permission
       }
     } catch (e) {
-      print("err: $e");
+      showSnackBar(type: ToastificationType.error, msg: "Error in recording!");
     }
   }
 
   Future<void> stopListening() async {
     try {
       _isRecording.value = false;
-      await Future.delayed(Duration(seconds: 1));
+      _sttStatus.value = 'Processing';
+      // await Future.delayed(const Duration(seconds: 1));
       await _recorder.stop();
       await _deepgramStreamSubscription?.cancel();
-      _sttStatus.value = 'Processing...';
       if (_transcript.value != '') {
         await Get.find<HomeController>().getResponse(_transcript.value);
         String messageText = Get.find<HomeController>().chats.last.parts.last
@@ -98,9 +100,10 @@ class DeepgramController extends GetxController {
         await speak(messageText);
       }
       _transcript.value = '';
-      _sttStatus.value = 'Inactive';
     } catch (e) {
       print("Error: $e");
+    } finally {
+      _sttStatus.value = 'Inactive';
     }
   }
 
@@ -113,12 +116,15 @@ class DeepgramController extends GetxController {
           'container': "wav",
         });
         final res = await _deepgramTTS.speakFromText("$text");
+        _sttStatus.value = 'Speaking';
         if (kIsWeb) {
           await _audioPlayer.play(BytesSource(res.data));
         }
       }
     } catch (e) {
       print('Error in TTS: $e');
+    } finally {
+      _sttStatus.value = 'Inactive';
     }
   }
 
