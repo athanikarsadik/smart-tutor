@@ -505,14 +505,13 @@ You are adept at managing the length of conversations, knowing when to conclude 
 
     newChats.add(chatMessage);
 
-    await Future.delayed(Duration(seconds: 3));
-
     final result = await sendChatMessage(
         chatMessage.copyWith(role: selectedAIModel.value));
 
     result.fold(
       (failure) {
         showSnackBar(type: ToastificationType.error, msg: failure.message);
+        newChats.removeLast();
       },
       (updatedMessage) {
         newChats.add(updatedMessage);

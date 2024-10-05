@@ -210,16 +210,19 @@ class _ChatWindowState extends State<ChatWindow> {
                         Widget animationWidget;
                         switch (_deepgramController.sttStatus) {
                           case 'Listening':
-                            animationWidget =
-                                Lottie.asset('assets/lottie/ai.json');
+                            animationWidget = Lottie.asset(
+                                'assets/lottie/listening.json',
+                                height: 100.h);
                             break;
                           case 'Processing':
-                            animationWidget =
-                                Lottie.asset('assets/lottie/streaming.json');
+                            animationWidget = Lottie.asset(
+                              'assets/lottie/streaming.json',
+                            );
                             break;
                           case 'Speaking':
-                            animationWidget =
-                                Lottie.asset('assets/lottie/ai.json');
+                            animationWidget = Lottie.asset(
+                              'assets/lottie/ai.json',
+                            );
                             break;
                           default:
                             animationWidget = SvgPicture.asset(

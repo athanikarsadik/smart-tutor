@@ -25,33 +25,32 @@ class CanvasRemoteDatasourcesImpl implements CanvasRemoteDatasources {
       }
 
       object['query'] = message.text;
+      object['model'] = message.role;
 
-      // 3. Make API call
-      // final response = await client.post(
-      //   Uri.parse(apiUrl),
-      //   body: json.encode(object),
-      //   headers: {'Content-Type': 'application/json'},
-      // );
-
-      // 4. Handle response
-      // if (response.statusCode == 200) {
-      // Successful API call
-      // final Map<String, dynamic> responseData = json.decode(response.body);
-      print("res: ");
-      return ChatMessageEntity(
-        role: "model",
-        text: "Hello, how are you, I am Groot. I am here to assist you!",
-        image: message.image,
+      final response = await client.post(
+        Uri.parse(apiUrl),
+        body: json.encode(object),
+        headers: <String, String>{
+          "Access-Control-Allow-Origin": "*",
+          'Content-Type': 'application/json',
+          'Accept': '*/*'
+        },
       );
-      // } else {
-      //   // API error
-      //   throw ServerFailure(
-      //       message: 'Server error: ${response.statusCode} - ${response.body}');
-      // }
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        return ChatMessageEntity(
+          role: "model",
+          text: responseData['response'],
+          image: message.image,
+        );
+      } else {
+        throw ServerFailure(
+            message: 'Server error: ${response.statusCode} - ${response.body}');
+      }
     } catch (e) {
-      // Handle other exceptions (e.g., network issues)
       if (e is ServerFailure) {
-        rethrow; // Rethrow ServerFailure to be handled at a higher level
+        rethrow;
       }
       throw UnexpectedFailure(message: 'An unexpected error occurred: $e');
     }

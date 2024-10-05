@@ -6,9 +6,20 @@ import 'package:socrita/core/routes/routes.dart';
 import 'package:socrita/core/theme/app_theme.dart';
 import 'package:socrita/init_dependencies.dart';
 import 'package:toastification/toastification.dart';
+import 'dart:io';
+
+class BadCertificateHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = BadCertificateHttpOverrides();
   InitDependencies.init();
   runApp(const MyApp());
 }
