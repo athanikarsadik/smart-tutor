@@ -494,7 +494,7 @@ You are adept at managing the length of conversations, knowing when to conclude 
   //   }
   // }
 
-  Future<void> getResponse(String text, [Uint8List? imageBytes]) async {
+  Future<String> getResponse(String text, [Uint8List? imageBytes]) async {
     isStreaming.value = true;
 
     final chatMessage = ChatMessageEntity(
@@ -512,13 +512,16 @@ You are adept at managing the length of conversations, knowing when to conclude 
       (failure) {
         showSnackBar(type: ToastificationType.error, msg: failure.message);
         newChats.removeLast();
+        return '';
       },
       (updatedMessage) {
         newChats.add(updatedMessage);
+        return updatedMessage.text;
       },
     );
 
     isStreaming.value = false;
+    return '';
     // update();
   }
 

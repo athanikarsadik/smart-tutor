@@ -251,7 +251,6 @@ class _ChatWindowState extends State<ChatWindow> {
                               ),
                               child: GestureDetector(
                                 onTap: () async {
-                                  print("${_deepgramController.isRecording}");
                                   if (_deepgramController.isRecording) {
                                     await _deepgramController.stopListening();
                                   } else {

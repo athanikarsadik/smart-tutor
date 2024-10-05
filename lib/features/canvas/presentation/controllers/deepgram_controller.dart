@@ -1,13 +1,14 @@
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:deepgram_speech_to_text/deepgram_speech_to_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
-import 'package:record/record.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:socrita/core/constants/show_snack_bar.dart';
 import 'package:socrita/features/canvas/presentation/controllers/home_controller.dart';
 import 'package:socrita/secrets.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:toastification/toastification.dart';
 
 class DeepgramController extends GetxController {
@@ -15,22 +16,16 @@ class DeepgramController extends GetxController {
   final RxString _sttStatus = 'Inactive'.obs;
   final RxBool _isRecording = false.obs;
 
-  late Deepgram _deepgram;
   late Deepgram _deepgramTTS;
-  late AudioRecorder _recorder;
   late AudioPlayer _audioPlayer;
+  final SpeechToText _speechToText = SpeechToText();
+  bool speechEnabled = false;
   StreamSubscription<DeepgramSttResult>? _deepgramStreamSubscription;
 
   @override
   void onInit() {
     super.onInit();
-    _deepgram = Deepgram(DEEPGRAM_API_KEY, baseQueryParams: {
-      'model': 'nova-2-general',
-      'detect_language': true,
-      'filler_words': false,
-      'punctuation': true,
-    });
-    _recorder = AudioRecorder();
+    _initSpeech();
     _audioPlayer = AudioPlayer();
     _setupAudioPlayerListeners();
   }
@@ -42,6 +37,22 @@ class DeepgramController extends GetxController {
 
   String get sttStatus => _sttStatus.value;
   bool get isRecording => _isRecording.value;
+
+  void _initSpeech() async {
+    speechEnabled = await _speechToText.initialize();
+  }
+
+  Future<void> _startListening() async {
+    await _speechToText.listen(onResult: _onSpeechResult);
+  }
+
+  Future<void> _stopListening() async {
+    await _speechToText.stop();
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    _transcript.value = result.recognizedWords;
+  }
 
   void _setupAudioPlayerListeners() {
     _audioPlayer.onPlayerComplete.listen((_) {
@@ -57,43 +68,11 @@ class DeepgramController extends GetxController {
 
   Future<void> startListening() async {
     try {
-      if (await _recorder.hasPermission()) {
-        _audioPlayer.pause();
-        _sttStatus.value = 'Listening';
-        _isRecording.value = true;
-        _transcript.value = '';
-
-        Stream<List<int>> micStream =
-            await _recorder.startStream(const RecordConfig(
-          encoder: AudioEncoder.pcm16bits,
-          sampleRate: 16000,
-          numChannels: 1,
-        ));
-
-        print(sttStatus);
-
-        final streamParams = {
-          'detect_language': false,
-          'language': 'en',
-          'encoding': 'linear16',
-          'sample_rate': 16000,
-        };
-
-        Stream<DeepgramSttResult> stream =
-            _deepgram.transcribeFromLiveAudioStream(micStream,
-                queryParams: streamParams);
-
-        _deepgramStreamSubscription = stream.listen((res) {
-          if (res.transcript != null && res.transcript!.isNotEmpty) {
-            _transcript.value += ' ${res.transcript!}';
-            print("Transcript: ${res.transcript}");
-          }
-        });
-      } else {
-        print("no per");
-        // Request microphone permission
-      }
+      _isRecording.value = true;
+      _sttStatus.value = 'Listening';
+      await _startListening();
     } catch (e) {
+      print(e);
       showSnackBar(type: ToastificationType.error, msg: "Error in recording!");
     }
   }
@@ -102,22 +81,19 @@ class DeepgramController extends GetxController {
     try {
       _isRecording.value = false;
       _sttStatus.value = 'Processing';
+      await _stopListening();
 
-      print(sttStatus);
-      // await Future.delayed(const Duration(seconds: 1));
-      await _recorder.stop();
       await _deepgramStreamSubscription?.cancel();
       if (_transcript.value != '') {
-        print("hey");
-        await Get.find<HomeController>().getResponse(_transcript.value);
-        String messageText = Get.find<HomeController>().newChats.last.text;
+        final res =
+            await Get.find<HomeController>().getResponse(_transcript.value);
 
-        // ? (Get.find<HomeController>().chats.last.parts.last as TextPart)
-        //     .text
-        // : 'Sorry I am not able to process, can you please repeate your question?';
-        await speak(messageText);
+        if (res.isNotEmpty) {
+          await speak(res);
+        }
       } else {
         _sttStatus.value = 'Inactive';
+        _isRecording.value = false;
       }
       _transcript.value = '';
     } catch (e) {
@@ -127,18 +103,15 @@ class DeepgramController extends GetxController {
 
   Future<void> speak(String text) async {
     try {
-      print("print");
       if (text.isNotEmpty) {
         _deepgramTTS = Deepgram(DEEPGRAM_API_KEY, baseQueryParams: {
           'model': Get.find<HomeController>().selectedAIVoice,
           'encoding': "linear16",
           'container': "wav",
         });
-        print("print");
         final res = await _deepgramTTS.speakFromText("$text");
         _sttStatus.value = 'Speaking';
 
-        print(sttStatus);
         if (kIsWeb) {
           await _audioPlayer.play(BytesSource(res.data));
         }
@@ -150,7 +123,8 @@ class DeepgramController extends GetxController {
 
   @override
   void onClose() {
-    _recorder.dispose();
+    _stopListening();
+    _speechToText.cancel();
     _audioPlayer.dispose();
     _deepgramStreamSubscription?.cancel();
     super.onClose();
