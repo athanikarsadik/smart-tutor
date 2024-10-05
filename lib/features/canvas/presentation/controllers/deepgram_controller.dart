@@ -69,6 +69,7 @@ class DeepgramController extends GetxController {
   Future<void> startListening() async {
     try {
       _isRecording.value = true;
+      _audioPlayer.pause();
       _sttStatus.value = 'Listening';
       await _startListening();
     } catch (e) {
