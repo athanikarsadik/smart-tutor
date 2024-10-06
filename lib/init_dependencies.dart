@@ -13,7 +13,7 @@ class InitDependencies {
   static void init() {
     final client = http.Client();
 
-    const apiUrl = 'http://34.47.131.231:5000/query';
+    const apiUrl = 'http://34.93.162.149:5000/query';
 
     final connectionChecker = ConnectionCheckerImpl(InternetConnection());
     final remoteDataSource =

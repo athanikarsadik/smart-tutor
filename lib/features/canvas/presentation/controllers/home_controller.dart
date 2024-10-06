@@ -508,7 +508,7 @@ You are adept at managing the length of conversations, knowing when to conclude 
     final result = await sendChatMessage(
         chatMessage.copyWith(role: selectedAIModel.value));
 
-    result.fold(
+    final res = result.fold(
       (failure) {
         showSnackBar(type: ToastificationType.error, msg: failure.message);
         newChats.removeLast();
@@ -521,7 +521,7 @@ You are adept at managing the length of conversations, knowing when to conclude 
     );
 
     isStreaming.value = false;
-    return '';
+    return res;
     // update();
   }
 

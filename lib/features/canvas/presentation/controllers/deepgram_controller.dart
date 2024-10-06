@@ -88,7 +88,6 @@ class DeepgramController extends GetxController {
       if (_transcript.value != '') {
         final res =
             await Get.find<HomeController>().getResponse(_transcript.value);
-
         if (res.isNotEmpty) {
           await speak(res);
         }

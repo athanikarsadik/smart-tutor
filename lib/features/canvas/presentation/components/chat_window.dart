@@ -13,12 +13,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../controllers/deepgram_controller.dart';
 import 'widgets/chat_dialog_section.dart';
 import 'widgets/custom_drop_down.dart';
+import 'widgets/wave_rive.dart';
 
 class ChatWindow extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback onChatIconTap;
 
-  ChatWindow({
+  const ChatWindow({
     super.key,
     required this.onClose,
     required this.onChatIconTap,
@@ -30,6 +31,7 @@ class ChatWindow extends StatefulWidget {
 
 class _ChatWindowState extends State<ChatWindow> {
   final controller = Get.find<HomeController>();
+  bool triggerOut = false;
 
   final DeepgramController _deepgramController = Get.find<DeepgramController>();
 
@@ -234,33 +236,61 @@ class _ChatWindowState extends State<ChatWindow> {
                             );
                         }
 
-                        return KeyboardListener(
-                          focusNode: _focusNode,
-                          onKeyEvent: _handleKeyEvent,
-                          child: Focus(
-                            autofocus: true,
-                            child: Container(
-                              padding: EdgeInsets.all(20.sp),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: _deepgramController.isRecording
-                                    ? AppColors.canvasButtonColor
-                                    : AppColors.canvasTernaryColor,
-                                border: Border.all(
-                                    color: AppColors.canvasBorderColor),
-                              ),
-                              child: GestureDetector(
-                                onTap: () async {
-                                  if (_deepgramController.isRecording) {
-                                    await _deepgramController.stopListening();
-                                  } else {
-                                    await _deepgramController.startListening();
-                                  }
-                                },
-                                child: animationWidget,
+                        return Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: RiveWaveBackground(
+                                assetPath: "rive/waves_assistant.riv",
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          ),
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    triggerOut = true; // Toggle the trigger
+                                  });
+                                },
+                                child: Text('Trigger Out'),
+                              ),
+                            ),
+                            // Spacer(),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: KeyboardListener(
+                                focusNode: _focusNode,
+                                onKeyEvent: _handleKeyEvent,
+                                child: Focus(
+                                  autofocus: true,
+                                  child: Container(
+                                    padding: EdgeInsets.all(20.sp),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: _deepgramController.isRecording
+                                          ? AppColors.canvasButtonColor
+                                          : AppColors.canvasTernaryColor,
+                                      border: Border.all(
+                                          color: AppColors.canvasBorderColor),
+                                    ),
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        if (_deepgramController.isRecording) {
+                                          await _deepgramController
+                                              .stopListening();
+                                        } else {
+                                          await _deepgramController
+                                              .startListening();
+                                        }
+                                      },
+                                      child: animationWidget,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         );
                       }),
                     ),

@@ -4,10 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:socrita/core/routes/routes.dart';
-import 'package:socrita/features/intro_screen/presentation/components/animated_button.dart';
 import 'package:socrita/features/intro_screen/presentation/components/gradient_ball.dart';
 import 'package:socrita/features/intro_screen/presentation/components/gradient_text.dart';
 import 'package:socrita/features/intro_screen/presentation/components/mesh_animation.dart';
+import 'package:socrita/features/intro_screen/presentation/components/rive_button.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
@@ -159,12 +159,17 @@ class _IntroScreenState extends State<IntroScreen>
                   ),
                 ),
                 SizedBox(height: 140.h),
-                AnimatedButton(
-                  onPressed: () {
-                    Get.toNamed(AppRoutes.homeScreen);
-                  },
-                  text: 'Get Started',
-                ),
+                GestureDetector(
+                    onTap: () {
+                      Get.toNamed(AppRoutes.homeScreen);
+                    },
+                    child: RiveButtonAnimation())
+                // AnimatedButton(
+                //   onPressed: () {
+                //     Get.toNamed(AppRoutes.homeScreen);
+                //   },
+                //   text: 'Get Started',
+                // ),
               ],
             ),
           ),
